@@ -34,8 +34,8 @@ class Historize:
     def initGui(self):
         self.action = QAction("Historize", self.iface.mainWindow())
         self.iface.addPluginToMenu("Historize", self.action)
-        self.dlg = HistorizeDialog()
-        QObject.connect(self.action, SIGNAL("activated()"), self.dlg.show)
+        self.histoDialog = HistorizeDialog()
+        QObject.connect(self.action, SIGNAL("activated()"), self.histoDialog.show)
 
     def unload(self):
         self.iface.removePluginMenu("Historize", self.action)
