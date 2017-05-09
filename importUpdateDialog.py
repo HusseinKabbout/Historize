@@ -1,30 +1,19 @@
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from qgis.utils import *
 from qgis.core import *
 from qgis.gui import *
-from ui_historize import Ui_Historize
-from importUpdateDialog import ImportUpdateDialog
+from ui_importUpdate import Ui_ImportUpdate
 
 
-class HistorizeDialog(QDialog, Ui_Historize):
+class ImportUpdateDialog(QDialog, Ui_ImportUpdate):
     """
     Class documentation goes here.
     """
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.setupUi(self)
-        self.updateDialog = ImportUpdateDialog()
-
-    @pyqtSignature("")
-    def on_btnUpdateHistoLyr_clicked(self):
-        """
-        Slot documentation goes here.
-        """
-        print "open update dialog"
-        self.updateDialog.show()
 
     @pyqtSignature("")
     def on_buttonBox_accepted(self):
