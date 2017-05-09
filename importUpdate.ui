@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>438</width>
-    <height>348</height>
+    <width>416</width>
+    <height>354</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Import Table Data</string>
@@ -30,7 +30,14 @@
           <string>Table:</string>
          </property>
         </widget>
-        <widget class="QComboBox" name="cmbImportTable"/>
+        <widget class="QComboBox" name="cmbImportTable">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
        </widget>
       </item>
       <item row="1" column="0" alignment="Qt::AlignRight">
@@ -41,8 +48,8 @@
        </widget>
       </item>
       <item row="2" column="0">
-       <layout class="QFormLayout" name="formLayout">
-        <item row="0" column="0">
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0" alignment="Qt::AlignTop">
          <widget class="QLabel" name="attribLabel">
           <property name="text">
            <string>Exclude Attributes:</string>
@@ -57,7 +64,7 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="1" column="0">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>

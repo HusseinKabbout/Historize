@@ -23,30 +23,33 @@ except AttributeError:
         return QtGui.QApplication.translate(context, text, disambig)
 
 class Ui_SelectDate(object):
-    def setupUi(self, Load):
-        Load.setObjectName(_fromUtf8("Load"))
-        Load.resize(388, 139)
-        self.buttonBox = QtGui.QDialogButtonBox(Load)
-        self.buttonBox.setGeometry(QtCore.QRect(40, 100, 341, 32))
-        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
-        self.buttonBox.setObjectName(_fromUtf8("buttonBox"))
-        self.dateBox = QtGui.QGroupBox(Load)
-        self.dateBox.setGeometry(QtCore.QRect(10, 10, 371, 91))
+    def setupUi(self, SelectDate):
+        SelectDate.setObjectName(_fromUtf8("SelectDate"))
+        SelectDate.resize(393, 131)
+        self.gridLayout_2 = QtGui.QGridLayout(SelectDate)
+        self.gridLayout_2.setObjectName(_fromUtf8("gridLayout_2"))
+        self.dateBox = QtGui.QGroupBox(SelectDate)
         self.dateBox.setObjectName(_fromUtf8("dateBox"))
         self.gridLayout = QtGui.QGridLayout(self.dateBox)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.cmbDate = QtGui.QComboBox(self.dateBox)
         self.cmbDate.setObjectName(_fromUtf8("cmbDate"))
         self.gridLayout.addWidget(self.cmbDate, 0, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.dateBox, 0, 0, 1, 1)
+        self.buttonBox = QtGui.QDialogButtonBox(SelectDate)
+        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
+        self.buttonBox.setObjectName(_fromUtf8("buttonBox"))
+        self.gridLayout_2.addWidget(self.buttonBox, 1, 0, 1, 1)
         self.dateBox.raise_()
         self.buttonBox.raise_()
 
-        self.retranslateUi(Load)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), Load.accept)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), Load.reject)
-        QtCore.QMetaObject.connectSlotsByName(Load)
+        self.retranslateUi(SelectDate)
+        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), SelectDate.accept)
+        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), SelectDate.reject)
+        QtCore.QMetaObject.connectSlotsByName(SelectDate)
 
-    def retranslateUi(self, Load):
-        Load.setWindowTitle(_translate("Load", "Load", None))
-        self.dateBox.setTitle(_translate("Load", "Select Date", None))
+    def retranslateUi(self, SelectDate):
+        SelectDate.setWindowTitle(_translate("SelectDate", "Load", None))
+        self.dateBox.setTitle(_translate("SelectDate", "Select Date", None))
+
