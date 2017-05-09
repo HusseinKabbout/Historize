@@ -22,7 +22,7 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-class Ui_Load(object):
+class Ui_SelectDate(object):
     def setupUi(self, Load):
         Load.setObjectName(_fromUtf8("Load"))
         Load.resize(388, 139)
@@ -50,4 +50,3 @@ class Ui_Load(object):
     def retranslateUi(self, Load):
         Load.setWindowTitle(_translate("Load", "Load", None))
         self.dateBox.setTitle(_translate("Load", "Select Date", None))
-

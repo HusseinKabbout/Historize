@@ -22,7 +22,7 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-class Ui_Dialog(object):
+class Ui_ImportUpdate(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName(_fromUtf8("Dialog"))
         Dialog.resize(438, 348)
@@ -70,4 +70,3 @@ class Ui_Dialog(object):
         self.tableLabel.setText(_translate("Dialog", "Table:", None))
         self.checkBox.setText(_translate("Dialog", "Has Geometry", None))
         self.attribLabel.setText(_translate("Dialog", "Exclude Attributes:", None))
-
