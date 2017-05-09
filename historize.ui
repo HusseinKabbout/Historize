@@ -45,123 +45,148 @@
     <attribute name="title">
      <string>Layer</string>
     </attribute>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="boxHistoLyr">
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>170</y>
+       <y>160</y>
        <width>581</width>
-       <height>141</height>
+       <height>151</height>
       </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
      <property name="title">
       <string>Historized Layers</string>
      </property>
-     <widget class="QSplitter" name="splitter">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>551</width>
-        <height>32</height>
-       </rect>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <widget class="QLabel" name="label_12">
-       <property name="text">
-        <string>Select Layer:</string>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="comboBox_3"/>
-     </widget>
-     <widget class="QWidget" name="">
-      <property name="geometry">
-       <rect>
-        <x>110</x>
-        <y>70</y>
-        <width>176</width>
-        <height>36</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QPushButton" name="pushButton_2">
-         <property name="text">
-          <string>Load</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButton_3">
-         <property name="text">
-          <string>Update</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="0" column="0">
+       <widget class="QLabel" name="lyrLabel_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Select Layer:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="btnLoadHistoLyr">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Load</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="btnUpdateHistoLyr">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Update</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3" alignment="Qt::AlignRight">
+       <widget class="QCheckBox" name="checkHistoGeom">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Has Geometry</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="3">
+       <widget class="QComboBox" name="cmbNonHistoLyr_2"/>
+      </item>
+     </layout>
     </widget>
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="boxNonHistoLyr">
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>30</y>
+       <y>3</y>
        <width>581</width>
-       <height>141</height>
+       <height>151</height>
       </rect>
      </property>
      <property name="title">
       <string>Non-Historized Layers</string>
      </property>
-     <widget class="QPushButton" name="pushButton">
-      <property name="geometry">
-       <rect>
-        <x>110</x>
-        <y>70</y>
-        <width>88</width>
-        <height>34</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Historize</string>
-      </property>
-     </widget>
-     <widget class="QSplitter" name="splitter_2">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>551</width>
-        <height>32</height>
-       </rect>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <widget class="QLabel" name="label_11">
-       <property name="text">
-        <string>Select Layer:</string>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="comboBox"/>
-     </widget>
-     <zorder>pushButton</zorder>
-     <zorder>comboBox</zorder>
-     <zorder>label_11</zorder>
-     <zorder>groupBox_3</zorder>
-     <zorder>groupBox</zorder>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="lyrLabel_1">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Select Layer:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2" alignment="Qt::AlignRight">
+       <widget class="QCheckBox" name="checkNonHistoGeom">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Has Geometry</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="2">
+       <widget class="QComboBox" name="cmbNonHistoLyr"/>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="btnHistoLyr">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Historize</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+     <zorder>splitter_2</zorder>
+     <zorder>btnHistoLyr</zorder>
+     <zorder>checkNonHistoGeom</zorder>
     </widget>
-    <zorder>groupBox</zorder>
-    <zorder>groupBox_2</zorder>
-    <zorder>groupBox_3</zorder>
    </widget>
    <widget class="QWidget" name="dbTab">
     <attribute name="title">
      <string>Database</string>
     </attribute>
-    <widget class="QPushButton" name="btnTest">
+    <widget class="QPushButton" name="btnTestConn">
      <property name="geometry">
       <rect>
        <x>450</x>
@@ -174,7 +199,7 @@
       <string>Test Connection</string>
      </property>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>2</x>
@@ -185,17 +210,17 @@
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0" colspan="2">
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="dbLabel">
         <property name="text">
          <string>Database:</string>
         </property>
        </widget>
       </item>
       <item row="0" column="3">
-       <widget class="QLineEdit" name="lineEdit"/>
+       <widget class="QLineEdit" name="lneDatabase"/>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="hostLabel">
         <property name="text">
          <string>Host:</string>
         </property>
@@ -215,10 +240,10 @@
        </spacer>
       </item>
       <item row="1" column="3">
-       <widget class="QLineEdit" name="lineEdit_2"/>
+       <widget class="QLineEdit" name="lneHost"/>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="portLabel">
         <property name="text">
          <string>Port:</string>
         </property>
@@ -238,10 +263,10 @@
        </spacer>
       </item>
       <item row="2" column="3">
-       <widget class="QLineEdit" name="lineEdit_3"/>
+       <widget class="QLineEdit" name="lnePort"/>
       </item>
       <item row="3" column="0">
-       <widget class="QLabel" name="label_4">
+       <widget class="QLabel" name="userLabel">
         <property name="text">
          <string>User:</string>
         </property>
@@ -261,17 +286,17 @@
        </spacer>
       </item>
       <item row="3" column="3">
-       <widget class="QLineEdit" name="lineEdit_5"/>
+       <widget class="QLineEdit" name="lneUser"/>
       </item>
       <item row="4" column="0" colspan="2">
-       <widget class="QLabel" name="label_5">
+       <widget class="QLabel" name="pswdLabel">
         <property name="text">
          <string>Password:</string>
         </property>
        </widget>
       </item>
       <item row="4" column="3">
-       <widget class="QLineEdit" name="lineEdit_4"/>
+       <widget class="QLineEdit" name="lnePassword"/>
       </item>
      </layout>
     </widget>
@@ -292,7 +317,7 @@
     </widget>
    </widget>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -303,7 +328,7 @@
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_3"/>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -314,6 +339,8 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2"/>
   </widget>
+  <zorder>layoutWidget</zorder>
+  <zorder>layoutWidget</zorder>
   <zorder>tabDoc</zorder>
   <zorder>buttonBox</zorder>
  </widget>

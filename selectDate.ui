@@ -35,22 +35,17 @@
      <x>10</x>
      <y>10</y>
      <width>371</width>
-     <height>81</height>
+     <height>91</height>
     </rect>
    </property>
    <property name="title">
     <string>Select Date</string>
    </property>
-   <widget class="QComboBox" name="comboBox">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>30</y>
-      <width>331</width>
-      <height>32</height>
-     </rect>
-    </property>
-   </widget>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QComboBox" name="cmbDate"/>
+    </item>
+   </layout>
   </widget>
   <zorder>dateBox</zorder>
   <zorder>buttonBox</zorder>
