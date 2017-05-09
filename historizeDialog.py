@@ -7,6 +7,7 @@ from qgis.core import *
 from qgis.gui import *
 from ui_historize import Ui_Historize
 from importUpdateDialog import ImportUpdateDialog
+from selectDateDialog import SelectDateDialog
 
 
 class HistorizeDialog(QDialog, Ui_Historize):
@@ -17,6 +18,7 @@ class HistorizeDialog(QDialog, Ui_Historize):
         QDialog.__init__(self, parent)
         self.setupUi(self)
         self.updateDialog = ImportUpdateDialog()
+        self.dateDialog = SelectDateDialog()
 
     @pyqtSignature("")
     def on_btnUpdateHistoLyr_clicked(self):
@@ -25,6 +27,14 @@ class HistorizeDialog(QDialog, Ui_Historize):
         """
         print "open update dialog"
         self.updateDialog.show()
+
+    @pyqtSignature("")
+    def on_btnLoadHistoLyr_clicked(self):
+        """
+        Slot documentation goes here.
+        """
+        print "open update dialog"
+        self.dateDialog.show()
 
     @pyqtSignature("")
     def on_buttonBox_accepted(self):
