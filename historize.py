@@ -21,7 +21,7 @@ from PyQt4.QtGui import *
 from qgis.core import *
 from qgis.gui import *
 from dbconn import DBConn
-from ui_historize import Ui_Historize
+from historizeDialog import HistorizeDialog
 
 
 class Historize:
@@ -34,7 +34,8 @@ class Historize:
     def initGui(self):
         self.action = QAction("Historize", self.iface.mainWindow())
         self.iface.addPluginToMenu("Historize", self.action)
-        # QObject.connect(self.action, SIGNAL("activated()"), self.handleFormofLayer)
+        self.dlg = HistorizeDialog()
+        QObject.connect(self.action, SIGNAL("activated()"), self.dlg.show)
 
     def unload(self):
         self.iface.removePluginMenu("Historize", self.action)
