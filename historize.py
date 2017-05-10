@@ -20,22 +20,69 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
 from qgis.gui import *
-from dbconn import DBConn
 from historizeDialog import HistorizeDialog
-
+from importUpdateDialog import ImportUpdateDialog
+from selectDateDialog import SelectDateDialog
+from aboutDialog import AboutDialog
 
 class Historize:
     """Class documentation goes here"""
 
     def __init__(self, iface):
         self.iface = iface
-        self.dbconn = DBConn(iface)
 
     def initGui(self):
-        self.action = QAction("Historize", self.iface.mainWindow())
-        self.iface.addPluginToMenu("Historize", self.action)
-        self.histoDialog = HistorizeDialog()
-        QObject.connect(self.action, SIGNAL("activated()"), self.histoDialog.show)
+        self.menu = QMenu()
+        self.menu.setTitle("Historize")
+
+        self.lyrMenu = QMenu()
+        self.lyrMenu.setTitle("Layer")
+
+        # Create menu actions
+        self.actionInit = QAction( u"Initialize Database", self.iface.mainWindow())
+        self.actionLyrInit = QAction(u"Initialize Layer", self.iface.mainWindow())
+        self.actionLyrUpdate = QAction(u"Update Layer", self.iface.mainWindow())
+        self.actionLyrLoad = QAction(u"Load Layer", self.iface.mainWindow())
+        self.actionAbout = QAction( u"About", self.iface.mainWindow())
+
+        # Connect menu actions
+        self.actionInit.triggered.connect(self.doInit)
+        self.actionLyrInit.triggered.connect(self.doLyrInit)
+        self.actionLyrUpdate.triggered.connect(self.doLyrUpdate)
+        self.actionLyrLoad.triggered.connect(self.doLyrLoad)
+        self.actionAbout.triggered.connect(self.doAbout)
+
+        # Add actions to menu
+        self.lyrMenu.addActions([self.actionLyrInit,  self.actionLyrUpdate, self.actionLyrLoad])
+        self.menu.addAction(self.actionInit)
+        self.menu.addMenu(self.lyrMenu)
+        self.menu.addAction(self.actionAbout)
+        self.menu.insertSeparator(self.actionAbout)
+        menuBar = self.iface.mainWindow().menuBar()
+        menuBar.addMenu(self.menu)
 
     def unload(self):
-        self.iface.removePluginMenu("Historize", self.action)
+        self.menu.deleteLater()
+
+    def doInit(self):
+        """Use Database info from layer and run historisation.sql on it."""
+        pass
+
+    def doLyrInit(self):
+        """Use Layer info and run init() .sql query"""
+        pass
+
+    def doLyrUpdate(self):
+        """Open ImportUpdate dialog"""
+        self.updateDialog = ImportUpdateDialog()
+        self.updateDialog.show()
+
+    def doLyrLoad(self):
+        """Open selectDate dialog"""
+        self.dateDialog = SelectDateDialog()
+        self.dateDialog.show()
+
+    def doAbout(self):
+        """Show About dialog"""
+        self.aboutDialog = AboutDialog()
+        self.aboutDialog.show()
