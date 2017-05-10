@@ -19,6 +19,28 @@ class HistorizeDialog(QDialog, Ui_Historize):
         self.setupUi(self)
         self.updateDialog = ImportUpdateDialog()
         self.dateDialog = SelectDateDialog()
+        self.loadLayers()
+
+    def loadLayers(self):
+        print "Populating Comboboxes"
+
+    @pyqtSignature("")
+    def on_btnTestConn_clicked(self):
+        """
+        Slot documentation goes here.
+        """
+        print "Testing Connection"
+
+    @pyqtSignature("")
+    def on_btnHistoLyr_clicked(self):
+        """
+        Slot documentation goes here.
+        """
+        result = QMessageBox.question(self, "Begin Historization", "Are you sure you wish to proceed?", QMessageBox.No | QMessageBox.Yes)
+        if result == QMessageBox.Yes:
+            print "Proceeding"
+        else:
+            return
 
     @pyqtSignature("")
     def on_btnUpdateHistoLyr_clicked(self):
