@@ -23,10 +23,12 @@ class SQLExecute:
     def __init__(self, cur=None):
         self.cur = cur
 
-    def histTabsInit(self):
-        print "Initializing Layer"
-        initQuery = "SELECT * FROM "
-        # self.cur.execute()
+    def histTabsInit(self, hasGeometry, schema, table):
+        print hasGeometry
+        print schema
+        print table
+        initQuery = "SELECT * FROM hist_tabs.init('%s.%s', %s)" % (schema, table, hasGeometry)
+        self.cur.execute(initQuery)
 
     def histTabsVersion(self):
         pass

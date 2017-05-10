@@ -73,21 +73,33 @@ class Historize:
     def doLyrInit(self):
         """Use Layer info and run init() .sql query"""
         selected_layer = self.iface.activeLayer()
+
+        if not selected_layer:
+            QMessageBox.warning(self.iface.mainWindow(), "Select Layer", "Please select a layer!")
+            return
+
         provider = selected_layer.dataProvider()
 
         if provider.name() != 'postgres':
+            QMessageBox.warning(self.iface.mainWindow(), "Invalid Layer", "Layer must be provided by postgres!")
             return
+
         uri = QgsDataSourceURI(provider.dataSourceUri())
         cur = self.dbconn.connectToDb(uri)
 
         if cur is False:
             return
 
+
         result = QMessageBox.warning(self.iface.mainWindow(), "Initialize Layer", "Are you sure you wish to proceed?", QMessageBox.No | QMessageBox.Yes)
         if result == QMessageBox.Yes:
-            print "Proceed"
+            # Get SQL vars
+            hasGeometry = selected_layer.hasGeometryType()
+            schema = uri.schema()
+            table = uri.table()
+
             self.execute = SQLExecute(cur)
-            self.execute.histTabsInit()
+            self.execute.histTabsInit(hasGeometry, schema, table)
         else:
             return
 
