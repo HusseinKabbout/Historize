@@ -20,14 +20,16 @@
 class SQLExecute:
     """Class documentation goes here"""
 
-    def __init__(iface):
-        self.iface = iface
+    def __init__(self, cur=None):
+        self.cur = cur
 
-    def histTabsInit():
+    def histTabsInit(self):
+        print "Initializing Layer"
+        initQuery = "SELECT * FROM "
+        # self.cur.execute()
+
+    def histTabsVersion(self):
         pass
 
-    def histTabsVersion():
-        pass
-
-    def histTabsUpdate():
+    def histTabsUpdate(self):
         pass

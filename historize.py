@@ -20,16 +20,18 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
 from qgis.gui import *
-from historizeDialog import HistorizeDialog
 from importUpdateDialog import ImportUpdateDialog
 from selectDateDialog import SelectDateDialog
 from aboutDialog import AboutDialog
+from dbconn import DBConn
+from sqlexecute import SQLExecute
 
 class Historize:
     """Class documentation goes here"""
 
     def __init__(self, iface):
         self.iface = iface
+        self.dbconn = DBConn(iface)
 
     def initGui(self):
         self.menu = QMenu()
@@ -70,7 +72,24 @@ class Historize:
 
     def doLyrInit(self):
         """Use Layer info and run init() .sql query"""
-        pass
+        selected_layer = self.iface.activeLayer()
+        provider = selected_layer.dataProvider()
+
+        if provider.name() != 'postgres':
+            return
+        uri = QgsDataSourceURI(provider.dataSourceUri())
+        cur = self.dbconn.connectToDb(uri)
+
+        if cur is False:
+            return
+
+        result = QMessageBox.warning(self.iface.mainWindow(), "Initialize Layer", "Are you sure you wish to proceed?", QMessageBox.No | QMessageBox.Yes)
+        if result == QMessageBox.Yes:
+            print "Proceed"
+            self.execute = SQLExecute(cur)
+            self.execute.histTabsInit()
+        else:
+            return
 
     def doLyrUpdate(self):
         """Open ImportUpdate dialog"""

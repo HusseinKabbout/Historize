@@ -28,5 +28,24 @@ class DBConn:
     def __init__(self, iface):
         self.iface = iface
 
-    def connectToDb():
-        pass
+    def connectToDb(self, uri):
+        """Create a connection from a uri and return a cursor of it."""
+        conninfo = uri.connectionInfo()
+        conn = None
+        cur = None
+        ok = False
+        while not conn:
+            try:
+                conn = psycopg2.connect(uri.connectionInfo())
+                cur = conn.cursor()
+            except psycopg2.OperationalError as e:
+                (ok, user, passwd) = QgsCredentials.instance().get(conninfo, uri.username(), uri.password())
+                if not ok:
+                    break
+        if not conn:
+            QMessageBox.warning(self.iface.mainWindow(), "Connection Error", "Could not connect to PostgreSQL database - check connection.")
+
+        if ok:
+            QgsCredentials.instance().put(conninfo, user, passwd)
+
+        return cur
