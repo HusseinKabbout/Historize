@@ -69,9 +69,12 @@ class ImportUpdateDialog(QDialog, Ui_ImportUpdate):
 
         # Returns Result to be parsed
         schemaTableList = self.execute.retrieveImportableTables()
+        cmbList = list()
         if schemaTableList:
             for entry in schemaTableList:
-                print entry[0]
+                cmbEntry = entry[0] + '.' + entry[1]
+                cmbList.append(cmbEntry)
+        self.cmbImportTable.addItems(cmbList)
 
     @pyqtSignature("")
     def on_buttonBox_accepted(self):
@@ -80,15 +83,10 @@ class ImportUpdateDialog(QDialog, Ui_ImportUpdate):
         """
         exclList = self.getCheckedAttributes()
         # Split the user selection for querying
-        select = self.cmbImportTable.currentText()
-        if select == "":
-            QMessageBox.warning(self.iface.mainWindow(), "Invalid Selection", "Please select an import table.")
-            self.show()
-        else:
-            splitString = select.split('.')
-            importSchema = splitString[0]
-            importTable = splitString[1]
-            self.execute.histTabsUpdate(importSchema, importTable, self.uri.schema(), self.selectedLayer, self.hasGeometry, exclList)
+        splitString = select.split('.')
+        importSchema = splitString[0]
+        importTable = splitString[1]
+        self.execute.histTabsUpdate(importSchema, importTable, self.uri.schema(), self.selectedLayer, self.hasGeometry, exclList)
         print "Accepted"
 
     @pyqtSignature("")

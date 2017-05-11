@@ -25,9 +25,6 @@ class SQLExecute:
         self.layer = layer
 
     def histTabsInit(self, hasGeometry, schema, table):
-        print hasGeometry
-        print schema
-        print table
         initQuery = "SELECT * FROM hist_tabs.init(%s.%s, %s)" % (schema, table, hasGeometry)
         self.cur.execute(initQuery)
 
@@ -51,7 +48,8 @@ class SQLExecute:
 
         importableQuery = "SELECT table_schema, table_name FROM information_schema.columns \
                            WHERE table_schema != 'information_schema' \
-                           OR table_schema != 'pg_catalog'"
+                           AND table_schema != 'pg_catalog' \
+                           AND NOT table_name IN ('spatial_ref_sys', 'geography_columns', 'geometry_columns', 'raster_columns')"
 
-        result = self.cur.execute(importableQuery)
-        return result
+        self.cur.execute(importableQuery)
+        return self.cur.fetchall()
