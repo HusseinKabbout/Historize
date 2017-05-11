@@ -72,13 +72,13 @@ class Historize:
 
     def doLyrInit(self):
         """Use Layer info and run init() .sql query"""
-        selected_layer = self.iface.activeLayer()
+        selectedLayer = self.iface.activeLayer()
 
-        if not selected_layer:
+        if not selectedLayer:
             QMessageBox.warning(self.iface.mainWindow(), "Select Layer", "Please select a layer!")
             return
 
-        provider = selected_layer.dataProvider()
+        provider = selectedLayer.dataProvider()
 
         if provider.name() != 'postgres':
             QMessageBox.warning(self.iface.mainWindow(), "Invalid Layer", "Layer must be provided by postgres!")
@@ -94,23 +94,23 @@ class Historize:
         result = QMessageBox.warning(self.iface.mainWindow(), "Initialize Layer", "Are you sure you wish to proceed?", QMessageBox.No | QMessageBox.Yes)
         if result == QMessageBox.Yes:
             # Get SQL vars
-            hasGeometry = selected_layer.hasGeometryType()
+            hasGeometry = selectedLayer.hasGeometryType()
             schema = uri.schema()
             table = uri.table()
 
-            self.execute = SQLExecute(cur)
+            self.execute = SQLExecute(cur, selectedLayer)
             self.execute.histTabsInit(hasGeometry, schema, table)
         else:
             return
 
     def doLyrUpdate(self):
         """Open ImportUpdate dialog"""
-        self.updateDialog = ImportUpdateDialog()
+        self.updateDialog = ImportUpdateDialog(self.iface)
         self.updateDialog.show()
 
     def doLyrLoad(self):
         """Open selectDate dialog"""
-        self.dateDialog = SelectDateDialog()
+        self.dateDialog = SelectDateDialog(self.iface)
         self.dateDialog.show()
 
     def doAbout(self):
