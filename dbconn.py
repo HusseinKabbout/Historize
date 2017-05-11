@@ -37,7 +37,6 @@ class DBConn:
         while not conn:
             try:
                 conn = psycopg2.connect(uri.connectionInfo())
-                cur = conn.cursor()
             except psycopg2.OperationalError as e:
                 (ok, user, passwd) = QgsCredentials.instance().get(conninfo, uri.username(), uri.password())
                 if not ok:
@@ -48,4 +47,4 @@ class DBConn:
         if ok:
             QgsCredentials.instance().put(conninfo, user, passwd)
 
-        return cur
+        return conn

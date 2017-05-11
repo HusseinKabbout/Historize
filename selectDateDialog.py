@@ -35,10 +35,9 @@ class SelectDateDialog(QDialog, Ui_SelectDate):
             return
 
         uri = QgsDataSourceURI(provider.dataSourceUri())
-        cur = self.dbconn.connectToDb(uri)
-
+        conn = self.dbconn.connectToDb(uri)
         self.schema = uri.schema()
-        self.execute = SQLExecute(cur, self.selectedLayer)
+        self.execute = SQLExecute(conn, self.selectedLayer)
         self.dateList = self.execute.retrieveHistVersions(self.selectedLayer)
         if not self.dateList:
             QMessageBox.warning(self.iface.mainWindow(), "Error", "No historized versions found!")

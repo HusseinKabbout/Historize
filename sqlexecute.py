@@ -20,16 +20,28 @@
 class SQLExecute:
     """Class documentation goes here"""
 
-    def __init__(self, cur=None, layer=None):
-        self.cur = cur
+    def __init__(self, conn=None, layer=None):
+        self.conn = conn
+        self.cur = conn.cursor()
         self.layer = layer
 
     def histTabsInit(self, hasGeometry, schema, table):
         initQuery = "SELECT * FROM hist_tabs.init(%s.%s, %s)" % (schema, table, hasGeometry)
-        self.cur.execute(initQuery)
+        try:
+            self.cur.execute(initQuery)
+            self.conn.commit()
+        except:
+            self.conn.rollback()
+        self.conn.close()
 
     def histTabsVersion(self, schema, table, date):
         versionQuery = "SELECT * FROM hist_tabs.version(NULL::%s.%s, %s)" % (schema, layer, date)
+        try:
+            self.cur.execute(versionQuery)
+            self.conn.commit()
+        except:
+            self.conn.rollback()
+        self.conn.close()
 
     def histTabsUpdate(self, importSchema, importTable, prodSchema, prodTable, hasGeometry, exclList):
         updateQuery = "SELECT * FROM hist_tabs.update( \
@@ -37,6 +49,12 @@ class SQLExecute:
                        %s.%s, \
                        %s, \
                        %s)" % (importSchema, importTable, prodSchema, prodTable, hasGeometry, exclList)
+        try:
+            self.cur.execute(updateQuery)
+            self.conn.commit()
+        except:
+            self.conn.rollback()
+        self.conn.close()
 
     def retrieveHistVersions(self, selected_layer):
         """Returns a list of historized dates or False"""

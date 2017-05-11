@@ -20,11 +20,13 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
 from qgis.gui import *
+import os
 from importUpdateDialog import ImportUpdateDialog
 from selectDateDialog import SelectDateDialog
 from aboutDialog import AboutDialog
 from dbconn import DBConn
 from sqlexecute import SQLExecute
+
 
 class Historize:
     """Class documentation goes here"""
@@ -82,9 +84,9 @@ class Historize:
             return
 
         uri = QgsDataSourceURI(provider.dataSourceUri())
-        cur = self.dbconn.connectToDb(uri)
-
-        if cur is False:
+        conn = self.dbconn.connectToDb(uri)
+        cur = conn.cursor()
+        if conn is False:
             return
 
         result = QMessageBox.warning(self.iface.mainWindow(), "Initialize Historisation", "Initialize historisation on this layers database?", QMessageBox.No | QMessageBox.Yes)
@@ -92,7 +94,9 @@ class Historize:
             # Executing Method taken from Stackoverflow:
             # http://stackoverflow.com/questions/19472922/reading-external-sql-script-in-python
             # Answer by user Azeirah and mpg
-            fd = open('sql/historisierung.sql', 'r')
+            sqlPath = os.path.dirname(os.path.realpath(__file__)) + '/sql/historisierung.sql'
+
+            fd = open(sqlPath, 'r')
             sqlFile = fd.read()
             fd.close()
 
@@ -105,10 +109,15 @@ class Historize:
                 # For example, if the tables do not yet exist, this will skip over
                 # the DROP TABLE commands
                 try:
-                    c.execute(command)
-                except OperationalError, msg:
-                    print "Command skipped: ", msg
-                    pass
+                    cur.execute(command)
+                except:
+                    print "Command skipped: " + command
+                    self.incomplete = True
+            if not self.incomplete:
+                conn.commit()
+            else:
+                conn.rollback()
+            conn.close()
         else:
             return
 
@@ -127,9 +136,10 @@ class Historize:
             return
 
         uri = QgsDataSourceURI(provider.dataSourceUri())
-        cur = self.dbconn.connectToDb(uri)
+        conn = self.dbconn.connectToDb(uri)
+        cur = conn.cursor()
 
-        if cur is False:
+        if conn is False:
             return
 
         result = QMessageBox.warning(self.iface.mainWindow(), "Initialize Layer", "Are you sure you wish to proceed?", QMessageBox.No | QMessageBox.Yes)
@@ -139,7 +149,7 @@ class Historize:
             schema = uri.schema()
             table = uri.table()
 
-            self.execute = SQLExecute(cur, selectedLayer)
+            self.execute = SQLExecute(conn, selectedLayer)
             self.execute.histTabsInit(hasGeometry, schema, table)
         else:
             return
