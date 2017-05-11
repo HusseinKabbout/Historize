@@ -68,7 +68,49 @@ class Historize:
 
     def doInit(self):
         """Use Database info from layer and run historisation.sql on it."""
-        pass
+
+        selectedLayer = self.iface.activeLayer()
+
+        if not selectedLayer:
+            QMessageBox.warning(self.iface.mainWindow(), "Select Layer", "Please select a layer!")
+            return
+
+        provider = selectedLayer.dataProvider()
+
+        if provider.name() != 'postgres':
+            QMessageBox.warning(self.iface.mainWindow(), "Invalid Layer", "Layer must be provided by postgres!")
+            return
+
+        uri = QgsDataSourceURI(provider.dataSourceUri())
+        cur = self.dbconn.connectToDb(uri)
+
+        if cur is False:
+            return
+
+        result = QMessageBox.warning(self.iface.mainWindow(), "Initialize Historisation", "Initialize historisation on this layers database?", QMessageBox.No | QMessageBox.Yes)
+        if result == QMessageBox.Yes:
+            # Executing Method taken from Stackoverflow:
+            # http://stackoverflow.com/questions/19472922/reading-external-sql-script-in-python
+            # Answer by user Azeirah and mpg
+            fd = open('sql/historisierung.sql', 'r')
+            sqlFile = fd.read()
+            fd.close()
+
+            # all SQL commands (split on ';')
+            sqlCommands = sqlFile.split(';')
+
+            # Execute every command from the input file
+            for command in sqlCommands:
+                # This will skip and report errors
+                # For example, if the tables do not yet exist, this will skip over
+                # the DROP TABLE commands
+                try:
+                    c.execute(command)
+                except OperationalError, msg:
+                    print "Command skipped: ", msg
+                    pass
+        else:
+            return
 
     def doLyrInit(self):
         """Use Layer info and run init() .sql query"""
@@ -89,7 +131,6 @@ class Historize:
 
         if cur is False:
             return
-
 
         result = QMessageBox.warning(self.iface.mainWindow(), "Initialize Layer", "Are you sure you wish to proceed?", QMessageBox.No | QMessageBox.Yes)
         if result == QMessageBox.Yes:
