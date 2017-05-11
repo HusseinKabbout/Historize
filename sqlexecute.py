@@ -20,18 +20,38 @@
 class SQLExecute:
     """Class documentation goes here"""
 
-    def __init__(self, cur=None):
+    def __init__(self, cur=None, layer=None):
         self.cur = cur
+        self.layer = layer
 
     def histTabsInit(self, hasGeometry, schema, table):
         print hasGeometry
         print schema
         print table
-        initQuery = "SELECT * FROM hist_tabs.init('%s.%s', %s)" % (schema, table, hasGeometry)
+        initQuery = "SELECT * FROM hist_tabs.init(%s.%s, %s)" % (schema, table, hasGeometry)
         self.cur.execute(initQuery)
 
-    def histTabsVersion(self):
-        pass
+    def histTabsVersion(self, schema, table, date):
+        versionQuery = "SELECT * FROM hist_tabs.version(NULL::%s.%s, %s)" % (schema, layer, date)
 
-    def histTabsUpdate(self):
-        pass
+    def histTabsUpdate(self, importSchema, importTable, prodSchema, prodTable, hasGeometry, exclList):
+        updateQuery = "SELECT * FROM hist_tabs.update( \
+                       %s.%s, \
+                       %s.%s, \
+                       %s, \
+                       %s)" % (importSchema, importTable, prodSchema, prodTable, hasGeometry, exclList)
+
+    def retrieveHistVersions(self, selected_layer):
+        """Returns a list of historized dates or False"""
+        # isHistorizedQuery = "SELECT * FROM hist_tabs WHERE myTable = %s" % selected_layer
+        return False
+
+    def retrieveImportableTables(self):
+        """Returns all table names and schemas eglible for an import"""
+
+        importableQuery = "SELECT table_schema, table_name FROM information_schema.columns \
+                           WHERE table_schema != 'information_schema' \
+                           OR table_schema != 'pg_catalog'"
+
+        result = self.cur.execute(importableQuery)
+        return result
