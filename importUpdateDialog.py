@@ -81,18 +81,17 @@ class ImportUpdateDialog(QDialog, Ui_ImportUpdate):
         """
         Slot documentation goes here.
         """
+        select = self.cmbImportTable.currentText()
         exclList = self.getCheckedAttributes()
         # Split the user selection for querying
         splitString = select.split('.')
         importSchema = splitString[0]
         importTable = splitString[1]
-        self.execute.histTabsUpdate(importSchema, importTable, self.uri.schema(), self.selectedLayer, self.hasGeometry, exclList)
-        print "Accepted"
+        self.execute.histTabsUpdate(importSchema, importTable, self.uri.schema(), self.selectedLayer.name(), self.hasGeometry, exclList)
 
     @pyqtSignature("")
     def on_buttonBox_rejected(self):
         """
         Slot documentation goes here.
         """
-        print "Close"
         self.close()
