@@ -54,7 +54,6 @@ class ImportUpdateDialog(QDialog, Ui_ImportUpdate):
         exclList = list()
         while self.model.item(i):
             if self.model.item(i).checkState():
-                print self.model.item(i).text()
                 exclList.append(self.model.item(i).text())
             i += 1
         return exclList
