@@ -91,31 +91,14 @@ class Historize:
 
         result = QMessageBox.warning(self.iface.mainWindow(), "Initialize Historisation", "Initialize historisation on this layers database?", QMessageBox.No | QMessageBox.Yes)
         if result == QMessageBox.Yes:
-            # Executing Method taken from Stackoverflow:
-            # http://stackoverflow.com/questions/19472922/reading-external-sql-script-in-python
-            # Answer by user Azeirah and mpg
             sqlPath = os.path.dirname(os.path.realpath(__file__)) + '/sql/historisierung.sql'
-
             fd = open(sqlPath, 'r')
             sqlFile = fd.read()
             fd.close()
-
-            # all SQL commands (split on ';')
-            sqlCommands = sqlFile.split(';')
-
-            # Execute every command from the input file
-            for command in sqlCommands:
-                # This will skip and report errors
-                # For example, if the tables do not yet exist, this will skip over
-                # the DROP TABLE commands
-                try:
-                    cur.execute(command)
-                except:
-                    print "Command skipped: " + command
-                    self.incomplete = True
-            if not self.incomplete:
+            try:
+                cur.execute(sqlFile[3:])
                 conn.commit()
-            else:
+            except:
                 conn.rollback()
             conn.close()
         else:
