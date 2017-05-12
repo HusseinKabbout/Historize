@@ -56,6 +56,8 @@ class Historize:
         self.actionLyrLoad.triggered.connect(self.doLyrLoad)
         self.actionAbout.triggered.connect(self.doAbout)
 
+        QObject.connect(self.iface.mapCanvas(), SIGNAL("currentLayerChanged(QgsMapLayer *)"), self.setMenuOptions)
+
         # Add actions to menu
         self.lyrMenu.addActions([self.actionLyrInit,  self.actionLyrUpdate, self.actionLyrLoad])
         self.menu.addAction(self.actionInit)
@@ -65,6 +67,12 @@ class Historize:
         menuBar = self.iface.mainWindow().menuBar()
         menuBar.addMenu(self.menu)
 
+        # Disable unusable actions
+        self.actionInit.setEnabled(False)
+        self.actionLyrInit.setEnabled(False)
+        self.actionLyrUpdate.setEnabled(False)
+        self.actionLyrLoad.setEnabled(False)
+
     def unload(self):
         self.menu.deleteLater()
 
@@ -72,11 +80,6 @@ class Historize:
         """Use Database info from layer and run historisation.sql on it."""
 
         selectedLayer = self.iface.activeLayer()
-
-        if not selectedLayer:
-            QMessageBox.warning(self.iface.mainWindow(), "Select Layer", "Please select a layer!")
-            return
-
         provider = selectedLayer.dataProvider()
 
         if provider.name() != 'postgres':
@@ -155,3 +158,28 @@ class Historize:
         """Show About dialog"""
         self.aboutDialog = AboutDialog()
         self.aboutDialog.show()
+
+    def setMenuOptions(self, layer):
+        # Reset Menu options
+        self.actionLyrInit.setEnabled(False)
+        self.actionLyrUpdate.setEnabled(False)
+        self.actionLyrLoad.setEnabled(False)
+        self.actionInit.setEnabled(False)
+
+        selectedLayer = self.iface.activeLayer()
+        if selectedLayer:
+            provider = layer.dataProvider()
+
+            if provider.name() == "postgres":
+                self.actionInit.setEnabled(True)
+                uri = QgsDataSourceURI(provider.dataSourceUri())
+                conn = self.dbconn.connectToDb(uri)
+                cur = conn.cursor()
+                self.execute = SQLExecute(conn)
+                result = self.execute.checkIfHistorised(uri.schema(), self.iface.activeLayer().name())
+
+                if result:
+                    self.actionLyrUpdate.setEnabled(True)
+                    self.actionLyrLoad.setEnabled(True)
+                else:
+                    self.actionLyrInit.setEnabled(True)
