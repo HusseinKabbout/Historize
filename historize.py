@@ -29,7 +29,7 @@ from sqlexecute import SQLExecute
 
 
 class Historize:
-    """Class documentation goes here"""
+    """This class handles the initialization and calls of the menu"""
 
     def __init__(self, iface):
         self.iface = iface
@@ -150,7 +150,11 @@ class Historize:
             table = uri.table()
 
             self.execute = SQLExecute(conn, selectedLayer)
-            self.execute.histTabsInit(hasGeometry, schema, table)
+            success = self.execute.histTabsInit(hasGeometry, schema, table)
+            if success:
+                QMessageBox.warning(self.iface.mainWindow(), "Success", "Layer successfully initialized!")
+            else:
+                QMessageBox.warning(self.iface.mainWindow(), "Error", "Initialization failed!")
         else:
             return
 
