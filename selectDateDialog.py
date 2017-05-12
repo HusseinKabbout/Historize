@@ -20,6 +20,7 @@ class SelectDateDialog(QDialog, Ui_SelectDate):
         self.dbconn = DBConn(iface)
         self.cmbDate.clear()
         self.getDates()
+        self.noRecords = True
 
     def getDates(self):
         self.selectedLayer = self.iface.activeLayer()
@@ -39,11 +40,13 @@ class SelectDateDialog(QDialog, Ui_SelectDate):
         self.schema = uri.schema()
         self.execute = SQLExecute(conn, self.selectedLayer)
         self.dateList = self.execute.retrieveHistVersions(self.selectedLayer)
+        print self.dateList
         if not self.dateList:
             QMessageBox.warning(self.iface.mainWindow(), "Error", "No historized versions found!")
-            self.noRecords = True
         else:
-            self.cmbDate.addItems(self.dateList)
+            for date in self.dateList:
+                self.cmbDate.addItem(str(date[0]))
+                self.noRecords = False
 
     @pyqtSignature("")
     def on_buttonBox_accepted(self):

@@ -24,15 +24,18 @@ class SQLExecute:
         self.conn = conn
         self.cur = conn.cursor()
         self.layer = layer
+        self.success = False
 
     def histTabsInit(self, hasGeometry, schema, table):
-        initQuery = "SELECT * FROM hist_tabs.init(%s.%s, %s)" % (schema, table, hasGeometry)
+        initQuery = "SELECT * FROM hist_tabs._table_init('%s.%s')" % (schema, table)
         try:
             self.cur.execute(initQuery)
             self.conn.commit()
+            self.success = True
         except:
             self.conn.rollback()
         self.conn.close()
+        return self.success
 
     def histTabsVersion(self, schema, table, date):
         versionQuery = "SELECT * FROM hist_tabs.version(NULL::%s.%s, %s)" % (schema, layer, date)
@@ -58,8 +61,16 @@ class SQLExecute:
 
     def retrieveHistVersions(self, selected_layer):
         """Returns a list of historized dates or False"""
-        # isHistorizedQuery = "SELECT * FROM hist_tabs WHERE myTable = %s" % selected_layer
-        return False
+        table = selected_layer.name()
+        getHistorizedDatesQuery = "SELECT DISTINCT valid_from FROM hist_tabs.public_cities_max_pop_gr_4m_testsample"
+        try:
+            self.cur.execute(getHistorizedDatesQuery)
+            self.conn.commit()
+        except:
+            self.conn.rollback()
+        dateList = self.cur.fetchall()
+        self.conn.close()
+        return dateList
 
     def retrieveImportableTables(self):
         """Returns all table names and schemas eglible for an import"""
