@@ -11,7 +11,7 @@ from dbconn import DBConn
 
 class SelectDateDialog(QDialog, Ui_SelectDate):
     """
-    Class documentation goes here.
+    Class responsible for handling the date selection.
     """
     def __init__(self, iface, parent=None):
         QDialog.__init__(self, parent)
@@ -22,23 +22,14 @@ class SelectDateDialog(QDialog, Ui_SelectDate):
         self.getDates()
 
     def getDates(self):
-        self.selectedLayer = self.iface.activeLayer()
-
-        if not self.selectedLayer:
-            QMessageBox.warning(self.iface.mainWindow(), "Select Layer", "Please select a layer!")
-            return
-
-        provider = self.selectedLayer.dataProvider()
-
-        if provider.name() != 'postgres':
-            QMessageBox.warning(self.iface.mainWindow(), "Invalid Layer", "Layer must be provided by postgres!")
-            return
-
+        """Get all historized dates from layer"""
+        provider = self.iface.activeLayer().dataProvider()
         uri = QgsDataSourceURI(provider.dataSourceUri())
-        conn = self.dbconn.connectToDb(uri)
+        self.conn = self.dbconn.connectToDb(uri)
         self.schema = uri.schema()
-        self.execute = SQLExecute(conn, self.selectedLayer)
-        self.dateList = self.execute.retrieveHistVersions(self.selectedLayer.name(), self.schema)
+        self.execute = SQLExecute(self.conn, self.iface.activeLayer())
+        self.dateList = self.execute.retrieveHistVersions(self.iface.activeLayer().name(), self.schema)
+
         if not self.dateList:
             self.records = False
             QMessageBox.warning(self.iface.mainWindow(), "Error", "No historized versions found!")
@@ -50,15 +41,15 @@ class SelectDateDialog(QDialog, Ui_SelectDate):
     @pyqtSignature("")
     def on_buttonBox_accepted(self):
         """
-        Slot documentation goes here.
+        Run hist_tabs.version() SQL-function
         """
         if self.records:
-            self.execute.histTabsVersion(self.schema, self.selectedLayer.name(), self.cmbDate.currentText())
+            self.execute.histTabsVersion(self.schema, self.iface.activeLayer().name(), self.cmbDate.currentText())
 
     @pyqtSignature("")
     def on_buttonBox_rejected(self):
         """
-        Slot documentation goes here.
+        Close Window and DB-Connection
         """
-        print "Close"
+        self.conn.close()
         self.close()

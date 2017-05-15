@@ -29,7 +29,7 @@ from sqlexecute import SQLExecute
 
 
 class Historize:
-    """This class handles the initialization and calls of the menu"""
+    """This class handles the initialization and calls of the menus"""
 
     def __init__(self, iface):
         self.iface = iface
@@ -160,7 +160,7 @@ class Historize:
         self.aboutDialog.show()
 
     def setMenuOptions(self, layer):
-        # Reset Menu options
+        """Enable/Disable menu options based on selected layer"""
         self.actionLyrInit.setEnabled(False)
         self.actionLyrUpdate.setEnabled(False)
         self.actionLyrLoad.setEnabled(False)

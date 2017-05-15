@@ -11,7 +11,7 @@ from dbconn import DBConn
 
 class ImportUpdateDialog(QDialog, Ui_ImportUpdate):
     """
-    Class documentation goes here.
+    Class responsible for handling the update() function.
     """
     def __init__(self, iface, parent=None):
         QDialog.__init__(self, parent)
@@ -22,26 +22,15 @@ class ImportUpdateDialog(QDialog, Ui_ImportUpdate):
         self.setImportableTables()
 
     def getAttributes(self):
+        """Place excludable attributes in model list"""
         # Model Structure used from Tutorial at
         # http://pythoncentral.io/pyside-pyqt-tutorial-qlistview-and-qstandarditemmodel/
+
         self.model = QStandardItemModel(self.listTblAttrib)
+        self.hasGeometry = self.iface.activeLayer().hasGeometryType()
+        self.provider = self.iface.activeLayer().dataProvider()
+        fields = self.iface.activeLayer().pendingFields()
 
-        self.selectedLayer = self.iface.activeLayer()
-
-        if not self.selectedLayer:
-            QMessageBox.warning(self.iface.mainWindow(), "Select Layer", "Please select a layer!")
-            return
-
-        self.hasGeometry = self.selectedLayer.hasGeometryType()
-        self.provider = self.selectedLayer.dataProvider()
-
-        if self.provider.name() != 'postgres':
-            QMessageBox.warning(self.iface.mainWindow(), "Invalid Layer", "Layer must be provided by postgres!")
-            return
-
-        fields = self.selectedLayer.pendingFields()
-
-        # http://pythoncentral.io/pyside-pyqt-tutorial-qlistview-and-qstandarditemmodel/
         for field in fields:
             item = QStandardItem(field.name())
             item.setCheckable(True)
@@ -78,7 +67,7 @@ class ImportUpdateDialog(QDialog, Ui_ImportUpdate):
     @pyqtSignature("")
     def on_buttonBox_accepted(self):
         """
-        Slot documentation goes here.
+        Run hist_tabs.update() SQL function with given parameters
         """
         select = self.cmbImportTable.currentText()
         exclList = self.getCheckedAttributes()
@@ -86,7 +75,7 @@ class ImportUpdateDialog(QDialog, Ui_ImportUpdate):
         splitString = select.split('.')
         importSchema = splitString[0]
         importTable = splitString[1]
-        self.execute.histTabsUpdate(importSchema, importTable, self.uri.schema(), self.selectedLayer.name(), self.hasGeometry, exclList)
+        self.execute.histTabsUpdate(importSchema, importTable, self.uri.schema(), self.iface.activeLayer().name(), self.hasGeometry, exclList)
 
     @pyqtSignature("")
     def on_buttonBox_rejected(self):

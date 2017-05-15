@@ -9,7 +9,7 @@ from ui_about import Ui_About
 
 class AboutDialog(QDialog, Ui_About):
     """
-    Class documentation goes here.
+    Class for displaying the user manual
     """
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)

@@ -23,16 +23,15 @@ import psycopg2
 
 
 class DBConn:
-    """Class documentation goes here"""
+    """Class for establishing a DB-connection"""
 
     def __init__(self, iface):
         self.iface = iface
 
     def connectToDb(self, uri):
-        """Create a connection from a uri and return a cursor of it."""
+        """Create a connection object from a uri and return it."""
         conninfo = uri.connectionInfo()
         conn = None
-        cur = None
         ok = False
         while not conn:
             try:
