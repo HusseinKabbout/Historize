@@ -37,21 +37,23 @@ class SQLExecute:
         self.conn.close()
         return self.success
 
-    def histTabsVersion(self, schema, table, date):
-        versionQuery = "SELECT * FROM hist_tabs.version(NULL::%s.%s, %s)" % (schema, layer, date)
+    def histTabsVersion(self, schema, layer, date):
+        versionQuery = "SELECT * FROM hist_tabs.version(NULL::%s.%s, '%s')" % (schema, layer, date)
         try:
             self.cur.execute(versionQuery)
             self.conn.commit()
         except:
             self.conn.rollback()
+            print "Failed to load version"
         self.conn.close()
 
     def histTabsUpdate(self, importSchema, importTable, prodSchema, prodTable, hasGeometry, exclList):
+        exclString = ', '.join(exclList)
         updateQuery = "SELECT * FROM hist_tabs.update( \
-                       %s.%s, \
-                       %s.%s, \
+                       '%s.%s', \
+                       '%s.%s', \
                        %s, \
-                       %s)" % (importSchema, importTable, prodSchema, prodTable, hasGeometry, exclList)
+                       '%s')" % (importSchema, importTable, prodSchema, prodTable, hasGeometry, exclString)
         try:
             self.cur.execute(updateQuery)
             self.conn.commit()
@@ -59,17 +61,16 @@ class SQLExecute:
             self.conn.rollback()
         self.conn.close()
 
-    def retrieveHistVersions(self, selected_layer):
+    def retrieveHistVersions(self, layer, schema):
         """Returns a list of historized dates or False"""
-        table = selected_layer.name()
-        getHistorizedDatesQuery = "SELECT DISTINCT valid_from FROM hist_tabs.public_cities_max_pop_gr_4m_testsample"
+        getHistorizedDatesQuery = "SELECT DISTINCT valid_from FROM hist_tabs.%s" % schema+"_"+layer
         try:
             self.cur.execute(getHistorizedDatesQuery)
             self.conn.commit()
+            dateList = self.cur.fetchall()
         except:
             self.conn.rollback()
-        dateList = self.cur.fetchall()
-        self.conn.close()
+            dateList = False
         return dateList
 
     def retrieveImportableTables(self):
@@ -82,3 +83,14 @@ class SQLExecute:
 
         self.cur.execute(importableQuery)
         return self.cur.fetchall()
+
+    def checkIfHistorised(self, schema, layer):
+        self.success = False
+        isHistorisedQuery = "SELECT hist_id FROM hist_tabs.%s" % schema+"_"+layer
+        try:
+            self.cur.execute(isHistorisedQuery)
+            self.success = True
+        except:
+            pass
+        self.conn.close()
+        return self.success
