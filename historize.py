@@ -99,6 +99,7 @@ class Historize:
             sqlFile = fd.read()
             fd.close()
             try:
+                # Ignore first three characters which invalidate the SQL command
                 cur.execute(sqlFile[3:])
                 conn.commit()
             except:
@@ -110,17 +111,7 @@ class Historize:
     def doLyrInit(self):
         """Use Layer info and run init() .sql query"""
         selectedLayer = self.iface.activeLayer()
-
-        if not selectedLayer:
-            QMessageBox.warning(self.iface.mainWindow(), "Select Layer", "Please select a layer!")
-            return
-
         provider = selectedLayer.dataProvider()
-
-        if provider.name() != 'postgres':
-            QMessageBox.warning(self.iface.mainWindow(), "Invalid Layer", "Layer must be provided by postgres!")
-            return
-
         uri = QgsDataSourceURI(provider.dataSourceUri())
         conn = self.dbconn.connectToDb(uri)
         cur = conn.cursor()
