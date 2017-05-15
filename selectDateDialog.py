@@ -24,9 +24,9 @@ class SelectDateDialog(QDialog, Ui_SelectDate):
     def getDates(self):
         """Get all historized dates from layer"""
         provider = self.iface.activeLayer().dataProvider()
-        uri = QgsDataSourceURI(provider.dataSourceUri())
-        self.conn = self.dbconn.connectToDb(uri)
-        self.schema = uri.schema()
+        self.uri = QgsDataSourceURI(provider.dataSourceUri())
+        self.conn = self.dbconn.connectToDb(self.uri)
+        self.schema = self.uri.schema()
         self.execute = SQLExecute(self.conn, self.iface.activeLayer())
         self.dateList = self.execute.retrieveHistVersions(self.iface.activeLayer().name(), self.schema)
 
@@ -44,7 +44,7 @@ class SelectDateDialog(QDialog, Ui_SelectDate):
         Run hist_tabs.version() SQL-function
         """
         if self.records:
-            self.execute.histTabsVersion(self.schema, self.iface.activeLayer().name(), self.cmbDate.currentText())
+            self.execute.histTabsVersion(self.schema, self.iface.activeLayer().name(), self.cmbDate.currentText(), self.uri)
 
     @pyqtSignature("")
     def on_buttonBox_rejected(self):

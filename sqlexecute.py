@@ -15,10 +15,12 @@
   *                                                                         *
   ***************************************************************************/
 """
+from datetime import datetime
+from qgis.core import QgsVectorLayer, QgsMapLayerRegistry, QgsDataSourceURI
 
 
 class SQLExecute:
-    """Class documentation goes here"""
+    """Class receives a connection object, creates a cursor for it and runs the SQL commands."""
 
     def __init__(self, conn=None, layer=None):
         self.conn = conn
@@ -37,14 +39,16 @@ class SQLExecute:
         self.conn.close()
         return self.success
 
-    def histTabsVersion(self, schema, layer, date):
+    def histTabsVersion(self, schema, layer, date, uri):
+        paramDate = datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f').date()
         versionQuery = "SELECT * FROM hist_tabs.version(NULL::%s.%s, '%s')" % (schema, layer, date)
         try:
-            self.cur.execute(versionQuery)
-            self.conn.commit()
+            uri.setDataSource("", u"(%s\n)" % versionQuery, "wkb_geometry", "", "fid")
+            vlayer = QgsVectorLayer(uri.uri(), "%s_%s_(Historised)" % (paramDate, layer), "postgres")
+            if vlayer.isValid():
+                QgsMapLayerRegistry.instance().addMapLayers([vlayer], True)
         except:
-            self.conn.rollback()
-            print "Failed to load version"
+            QMessageBox.warning(self.iface.mainWindow(), "Error", "Unable to load layer to map reigstry.")
         self.conn.close()
 
     def histTabsUpdate(self, importSchema, importTable, prodSchema, prodTable, hasGeometry, exclList):
@@ -54,11 +58,11 @@ class SQLExecute:
                        '%s.%s', \
                        %s, \
                        '%s')" % (importSchema, importTable, prodSchema, prodTable, hasGeometry, exclString)
-        try:
-            self.cur.execute(updateQuery)
-            self.conn.commit()
-        except:
-            self.conn.rollback()
+        #try:
+        self.cur.execute(updateQuery)
+        #    self.conn.commit()
+        #except:
+        #    self.conn.rollback()
         self.conn.close()
 
     def retrieveHistVersions(self, layer, schema):
