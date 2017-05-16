@@ -34,6 +34,23 @@ class Historize:
     def __init__(self, iface):
         self.iface = iface
         self.dbconn = DBConn(iface)
+        self.plugin_dir = os.path.dirname(__file__)
+        # initialize locale
+        locale = QSettings().value('locale/userLocale')[0:2]
+        locale_path = os.path.join(
+            self.plugin_dir,
+            'i18n',
+            'Historize_{}.qm'.format(locale))
+
+        if os.path.exists(locale_path):
+            self.translator = QTranslator()
+            self.translator.load(locale_path)
+
+            if qVersion() > '4.3.3':
+                QCoreApplication.installTranslator(self.translator)
+
+    def tr(self, message):
+        return QCoreApplication.translate('Historize', message)
 
     def initGui(self):
         self.menu = QMenu()
@@ -43,11 +60,11 @@ class Historize:
         self.lyrMenu.setTitle("Layer")
 
         # Create menu actions
-        self.actionInit = QAction( u"Initialize Database", self.iface.mainWindow())
-        self.actionLyrInit = QAction(u"Initialize Layer", self.iface.mainWindow())
-        self.actionLyrUpdate = QAction(u"Update Layer", self.iface.mainWindow())
-        self.actionLyrLoad = QAction(u"Load Layer", self.iface.mainWindow())
-        self.actionAbout = QAction( u"About", self.iface.mainWindow())
+        self.actionInit = QAction(self.tr(u"Initialize Database"), self.iface.mainWindow())
+        self.actionLyrInit = QAction(self.tr(u"Initialize Layer"), self.iface.mainWindow())
+        self.actionLyrUpdate = QAction(self.tr(u"Update Layer"), self.iface.mainWindow())
+        self.actionLyrLoad = QAction(self.tr(u"Load Layer"), self.iface.mainWindow())
+        self.actionAbout = QAction(self.tr(u"About"), self.iface.mainWindow())
 
         # Connect menu actions
         self.actionInit.triggered.connect(self.doInit)
@@ -83,7 +100,7 @@ class Historize:
         provider = selectedLayer.dataProvider()
 
         if provider.name() != 'postgres':
-            QMessageBox.warning(self.iface.mainWindow(), "Invalid Layer", "Layer must be provided by postgres!")
+            QMessageBox.warning(self.iface.mainWindow(), self.tr(u"Invalid Layer"), self.tr(u"Layer must be provided by postgres!"))
             return
 
         uri = QgsDataSourceURI(provider.dataSourceUri())
@@ -92,7 +109,7 @@ class Historize:
         if conn is False:
             return
 
-        result = QMessageBox.warning(self.iface.mainWindow(), "Initialize Historisation", "Initialize historisation on this layers database?", QMessageBox.No | QMessageBox.Yes)
+        result = QMessageBox.warning(self.iface.mainWindow(), self.tr(u"Initialize Historisation"), self.tr(u"Initialize historisation on this layers database?"), QMessageBox.No | QMessageBox.Yes)
         if result == QMessageBox.Yes:
             sqlPath = os.path.dirname(os.path.realpath(__file__)) + '/sql/historisierung.sql'
             fd = open(sqlPath, 'r')
@@ -119,7 +136,7 @@ class Historize:
         if conn is False:
             return
 
-        result = QMessageBox.warning(self.iface.mainWindow(), "Initialize Layer", "Are you sure you wish to proceed?", QMessageBox.No | QMessageBox.Yes)
+        result = QMessageBox.warning(self.iface.mainWindow(), self.tr(u"Initialize Layer"), self.tr(u"Are you sure you wish to proceed?"), QMessageBox.No | QMessageBox.Yes)
         if result == QMessageBox.Yes:
             # Get SQL vars
             hasGeometry = selectedLayer.hasGeometryType()
@@ -129,9 +146,9 @@ class Historize:
             self.execute = SQLExecute(conn, selectedLayer)
             success = self.execute.histTabsInit(hasGeometry, schema, table)
             if success:
-                QMessageBox.warning(self.iface.mainWindow(), "Success", "Layer successfully initialized!")
+                QMessageBox.warning(self.iface.mainWindow(), self.tr(u"Success"), self.tr(u"Layer successfully initialized!"))
             else:
-                QMessageBox.warning(self.iface.mainWindow(), "Error", "Initialization failed!")
+                QMessageBox.warning(self.iface.mainWindow(), self.tr(u"Error"), self.tr(u"Initialization failed!"))
         else:
             return
 

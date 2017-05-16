@@ -48,7 +48,7 @@ class SQLExecute:
             if vlayer.isValid():
                 QgsMapLayerRegistry.instance().addMapLayers([vlayer], True)
         except:
-            QMessageBox.warning(self.iface.mainWindow(), "Error", "Unable to load layer to map reigstry.")
+            QMessageBox.warning(self.iface.mainWindow(), self.tr(u"Error"), self.tr(u"Unable to load layer to map reigstry."))
         self.conn.close()
 
     def histTabsUpdate(self, importSchema, importTable, prodSchema, prodTable, hasGeometry, exclList):

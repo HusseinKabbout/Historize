@@ -32,7 +32,7 @@ class SelectDateDialog(QDialog, Ui_SelectDate):
 
         if not self.dateList:
             self.records = False
-            QMessageBox.warning(self.iface.mainWindow(), "Error", "No historized versions found!")
+            QMessageBox.warning(self.iface.mainWindow(), self.tr(u"Error"), self.tr(u"No historized versions found!"))
         else:
             for date in self.dateList:
                 self.cmbDate.addItem(str(date[0]))

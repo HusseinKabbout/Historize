@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'importUpdate.ui'
+# Form implementation generated from reading ui file 'ui/importUpdate.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
@@ -45,9 +45,6 @@ class Ui_ImportUpdate(object):
         self.cmbImportTable.setSizePolicy(sizePolicy)
         self.cmbImportTable.setObjectName(_fromUtf8("cmbImportTable"))
         self.gridLayout.addWidget(self.splitter, 0, 0, 1, 1)
-        self.checkBox = QtGui.QCheckBox(self.groupBox)
-        self.checkBox.setObjectName(_fromUtf8("checkBox"))
-        self.gridLayout.addWidget(self.checkBox, 1, 0, 1, 1, QtCore.Qt.AlignRight)
         self.gridLayout_3 = QtGui.QGridLayout()
         self.gridLayout_3.setObjectName(_fromUtf8("gridLayout_3"))
         self.attribLabel = QtGui.QLabel(self.groupBox)
@@ -56,7 +53,7 @@ class Ui_ImportUpdate(object):
         self.listTblAttrib = QtGui.QListView(self.groupBox)
         self.listTblAttrib.setObjectName(_fromUtf8("listTblAttrib"))
         self.gridLayout_3.addWidget(self.listTblAttrib, 0, 1, 1, 1)
-        self.gridLayout.addLayout(self.gridLayout_3, 2, 0, 1, 1)
+        self.gridLayout.addLayout(self.gridLayout_3, 1, 0, 1, 1)
         self.gridLayout_2.addWidget(self.groupBox, 0, 0, 1, 1)
         self.buttonBox = QtGui.QDialogButtonBox(ImportUpdate)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
@@ -70,9 +67,8 @@ class Ui_ImportUpdate(object):
         QtCore.QMetaObject.connectSlotsByName(ImportUpdate)
 
     def retranslateUi(self, ImportUpdate):
-        ImportUpdate.setWindowTitle(_translate("ImportUpdate", "Dialog", None))
+        ImportUpdate.setWindowTitle(_translate("ImportUpdate", "Update Table", None))
         self.groupBox.setTitle(_translate("ImportUpdate", "Import Table Data", None))
         self.tableLabel.setText(_translate("ImportUpdate", "Table:", None))
-        self.checkBox.setText(_translate("ImportUpdate", "Has Geometry", None))
         self.attribLabel.setText(_translate("ImportUpdate", "Exclude Attributes:", None))
 

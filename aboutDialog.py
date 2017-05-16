@@ -14,6 +14,7 @@ class AboutDialog(QDialog, Ui_About):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.setupUi(self)
+        self.aboutView.setHtml("doc/html/about.html")
 
     @pyqtSignature("")
     def on_buttonBox_accepted(self):

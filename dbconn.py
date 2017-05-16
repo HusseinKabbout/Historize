@@ -41,7 +41,7 @@ class DBConn:
                 if not ok:
                     break
         if not conn:
-            QMessageBox.warning(self.iface.mainWindow(), "Connection Error", "Could not connect to PostgreSQL database - check connection.")
+            QMessageBox.warning(self.iface.mainWindow(), self.tr(u"Connection Error"), self.tr(u"Could not connect to PostgreSQL database - check connection."))
 
         if ok:
             QgsCredentials.instance().put(conninfo, user, passwd)
