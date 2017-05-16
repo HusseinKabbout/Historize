@@ -69,14 +69,14 @@ class Historize:
         # Connect menu actions
         self.actionInit.triggered.connect(self.doInit)
         self.actionLyrInit.triggered.connect(self.doLyrInit)
-        self.actionLyrUpdate.triggered.connect(self.doLyrUpdate)
         self.actionLyrLoad.triggered.connect(self.doLyrLoad)
+        self.actionLyrUpdate.triggered.connect(self.doLyrUpdate)
         self.actionAbout.triggered.connect(self.doAbout)
 
         QObject.connect(self.iface.mapCanvas(), SIGNAL("currentLayerChanged(QgsMapLayer *)"), self.setMenuOptions)
 
         # Add actions to menu
-        self.lyrMenu.addActions([self.actionLyrInit,  self.actionLyrUpdate, self.actionLyrLoad])
+        self.lyrMenu.addActions([self.actionLyrInit, self.actionLyrLoad, self.actionLyrUpdate])
         self.menu.addAction(self.actionInit)
         self.menu.addMenu(self.lyrMenu)
         self.menu.addAction(self.actionAbout)
@@ -119,8 +119,10 @@ class Historize:
                 # Ignore first three characters which invalidate the SQL command
                 cur.execute(sqlFile[3:])
                 conn.commit()
+                QMessageBox.warning(self.iface.mainWindow(), self.tr(u"Success"), self.tr(u"Database initialized successfully!"))
             except:
                 conn.rollback()
+                QMessageBox.warning(self.iface.mainWindow(), self.tr(u"Error"), self.tr(u"Unable to initialize database!"))
             conn.close()
         else:
             return

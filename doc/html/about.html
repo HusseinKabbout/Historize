@@ -1,0 +1,129 @@
+<html>
+  <body>
+    <div>
+      <h1>Historize Plugin</h1>
+      <p>
+        Author: William Habelt
+        <br>
+        Version: 1.0
+      </p>
+      <p>The Historize Plugin was developed in order to offer a simple solution to keeping track of layers and their edits.</p>
+      <h3>Table of Contents</h3>
+      <ul>
+        <li>Prerequisites</li>
+        <li>Menu behaviour</li>
+        <li>Initialize Database</li>
+        <li>Initialize Layer</li>
+        <li>Load Layer</li>
+        <li>Update Layer</li>
+      </ul>
+      <br>
+    </div>
+    <div>
+      <h4>Prerequisites</h4>
+      <p>In order for the historisation process to work correctly following conditions must be met:<p>
+      <ul>
+        <li>You must have at least one PostGIS layer in your project</li>
+        <li>The PostGIS database may not have a schema by the name of 'hist_tabs'. This name is used by the plugin.</li>
+      </ul>
+      <p>The following instructions assume these conditions are met. If you still
+        encounter problems please submit a ticket to
+        <a href="https://github.com/HabeltWi/Historize/issues">https://github.com/HabeltWi/Historize/issues</a>
+      </p>
+    </div>
+    <div>
+      <h4>Menu behaviour</h4>
+      <p>
+        In order to reduce the likelyhood of invalid inputs and by extension errors, the Historize plugin will
+        automatically determine which menu-options are available whenever you select a layer from the Map Registry.
+        If an option is unselectable you must first make sure you have selected a valid layer from the Map Registry
+        (as per the prerequisites as mentioned previously). It is also not intended that multiple layers be
+        selected so if you choose to do so anyway the plugin might not function as intended. Do so at your own risk.
+      </p>
+      <p>
+        If you reload the plugin you will have to reselect your layer as well. This is because the menu-options update
+        themselves whenever a layer is selected in the Map Registry. 
+    </div>
+    <div>
+      <h4>Initialize Database</h4>
+      <img src="img/initDb.png" alt="Menu: Initialize Database" style="width:160px;height:124px;"/>
+      <p>This function sets up the historisation framework on the database. This is the first thing you should do when starting out.</p>
+      <ul>
+        <li>Select a layer of the database you wish to initialize from the Map Registry.</li>
+        <li>Click 'Initialize Database'.</li>
+        <li>When prompted whether you wish to proceed click 'OK'.</li>
+      </ul>
+      <p>
+        The plugin will then run the SQL Commands found in the file 'historisierung.sql'
+        (.qgis2/python/plugins/Historize/sql/historisierung.sql). When the process is done
+        you will be notified. To make extra sure that the process worked, open PG-Admin
+        and confirm that the 'hist_tabs' schema has been created in the database.
+      </p>
+    </div>
+    <div>
+      <h4>Initialize Layer</h4>
+      <img src="img/initLayer.png" alt="Menu: Initialize Layer" style="width:280px;height:140px;"/>
+      <p>
+        Once the database has been initialized you may now begin with the historization of your map layers.
+      </p>
+      <ul>
+        <li>Select a layer you wish to initialize from the Map Registry.</li>
+        <li>Click 'Initialize Layer'.</li>
+      </ul>
+      <p>
+        A message box will inform you of the plugins success or failure. Remember: The selected
+        layer must be a part of the database where the historisation framework was already initialized.
+      </p>
+    </div>
+    <div>
+      <h4>Load Layer</h4>
+      <img src="img/loadLayer1.png" alt="Menu: Load Layer" style="width:280px;height:140px;"/>
+      <p>
+        As you edit your historized layers, the changes are recorded and saved automatically
+        through triggers. If you open the database you will be able to see exactly when
+        something was changed and by whom. The fascinating part however is to load a view of
+        an earlier timestamp and to see how things have changed.
+      </p>
+      <ul>
+        <li>Select the layer whose timestamp you wish to load from the Map Registry.</li>
+        <li>Click 'Load Layer'.</li>
+        <li>Select the desired date from the menu</li>
+        <br>
+        <img src="img/loadLayer2.png" alt="Load Layer Dialog" style="width:400px;height:200px;"/>
+        <br>
+        <li>Click 'OK'</li>
+      </ul>
+      <p>
+        The timestamp of the layer will then be loaded to the Map Registry. The name is lead by
+        the selected date and ends with the bracketed tag '(Historized)'. You may load as many
+        copies of the same timestamp if you wish or any number of different ones. Just be careful
+        not to lose track of them.
+      </p>
+      <img src="img/loadLayerResult.png" alt="Loaded Layer in Map Registry" style="width:440px;height:60px;"/>
+    </div>
+    <div>
+      <h4>Update Layer</h4>
+      <img src="img/updateLayer.png" alt="Menu: Update Layer" style="width:280px;height:140px;"/>
+      <p>
+        While working with a layer there may be a large import of data you wish to add. This
+        function aims to allow you to do just that. The requirement for this however is that
+        the target and import tables must share the same structure. In order to guarantee this
+        you may choose to exclude certain fields.
+      <p>
+      <ul>
+        <li>Select the target layer to which you want to import the data from the Map Registry.</li>
+        <li>Click 'Update Layer'.</li>
+        <li>Select the layer from which to import the information from the dropdown.</li>
+        <li>Check the attributes of the target layer to exclude from the list.'</li>
+        <br>
+        <img src="img/updateLayer2.png" alt="Update Layer Dialog" style="width:430px;height:395px;"/>
+        <br>
+        <li>Click 'OK'</li>
+      </ul>
+      <p>
+        The import will then proceed and inform you of it's success when it is done. !IMPORTANT!: As
+        of this version this function is not yet properly implemented! Errors are to be expected!
+      <p>
+    </div>
+  <body>
+</html>
