@@ -1,3 +1,20 @@
+"""
+ /***************************************************************************
+   QGIS Historize Plugin
+  -------------------------------------------------------------------
+ Date                 : 09 Mai 2017
+ Copyright            : (C) 2017 by William Habelt
+ email                : wha@sourcepole.ch
+
+  ***************************************************************************
+  *                                                                         *
+  *   This program is free software; you can redistribute it and/or modify  *
+  *   it under the terms of the GNU General Public License as published by  *
+  *   the Free Software Foundation; either version 2 of the License, or     *
+  *   (at your option) any later version.                                   *
+  *                                                                         *
+  ***************************************************************************/
+"""
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
@@ -26,9 +43,9 @@ class SelectDateDialog(QDialog, Ui_SelectDate):
         provider = self.iface.activeLayer().dataProvider()
         self.uri = QgsDataSourceURI(provider.dataSourceUri())
         self.conn = self.dbconn.connectToDb(self.uri)
-        self.schema = self.uri.schema()
+        # self.schema = self.uri.schema()
         self.execute = SQLExecute(self.conn, self.iface.activeLayer())
-        self.dateList = self.execute.retrieveHistVersions(self.iface.activeLayer().name(), self.schema)
+        self.dateList = self.execute.retrieveHistVersions(self.iface.activeLayer().name(), self.uri.schema())
 
         if not self.dateList:
             self.records = False
@@ -44,7 +61,7 @@ class SelectDateDialog(QDialog, Ui_SelectDate):
         Run hist_tabs.version() SQL-function
         """
         if self.records:
-            self.execute.histTabsVersion(self.schema, self.iface.activeLayer().name(), self.cmbDate.currentText(), self.uri)
+            self.execute.histTabsVersion(self.uri.schema(), self.iface.activeLayer().name(), self.cmbDate.currentText(), self.uri)
 
     @pyqtSignature("")
     def on_buttonBox_rejected(self):

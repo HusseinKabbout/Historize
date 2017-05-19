@@ -30,20 +30,20 @@ class DBConn:
 
     def connectToDb(self, uri):
         """Create a connection object from a uri and return it."""
-        conninfo = uri.connectionInfo()
+        # conninfo = uri.connectionInfo()
         conn = None
         ok = False
         while not conn:
             try:
                 conn = psycopg2.connect(uri.connectionInfo())
             except psycopg2.OperationalError as e:
-                (ok, user, passwd) = QgsCredentials.instance().get(conninfo, uri.username(), uri.password())
+                (ok, user, passwd) = QgsCredentials.instance().get(uri.connectionInfo(), uri.username(), uri.password())
                 if not ok:
                     break
         if not conn:
             QMessageBox.warning(self.iface.mainWindow(), self.tr(u"Connection Error"), self.tr(u"Could not connect to PostgreSQL database - check connection."))
 
         if ok:
-            QgsCredentials.instance().put(conninfo, user, passwd)
+            QgsCredentials.instance().put(uri.connectionInfo(), user, passwd)
 
         return conn

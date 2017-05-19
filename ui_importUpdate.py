@@ -1,3 +1,20 @@
+"""
+ /***************************************************************************
+   QGIS Historize Plugin
+  -------------------------------------------------------------------
+ Date                 : 09 Mai 2017
+ Copyright            : (C) 2017 by William Habelt
+ email                : wha@sourcepole.ch
+
+  ***************************************************************************
+  *                                                                         *
+  *   This program is free software; you can redistribute it and/or modify  *
+  *   it under the terms of the GNU General Public License as published by  *
+  *   the Free Software Foundation; either version 2 of the License, or     *
+  *   (at your option) any later version.                                   *
+  *                                                                         *
+  ***************************************************************************/
+"""
 # -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file 'ui/importUpdate.ui'
@@ -71,4 +88,3 @@ class Ui_ImportUpdate(object):
         self.groupBox.setTitle(_translate("ImportUpdate", "Import Table Data", None))
         self.tableLabel.setText(_translate("ImportUpdate", "Table:", None))
         self.attribLabel.setText(_translate("ImportUpdate", "Exclude Attributes:", None))
-
