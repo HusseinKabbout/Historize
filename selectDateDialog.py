@@ -15,14 +15,15 @@
   *                                                                         *
   ***************************************************************************/
 """
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt4.QtCore import pyqtSignature
+from PyQt4.QtGui import QDialog, QMessageBox
 
-from qgis.utils import *
-from qgis.core import *
-from qgis.gui import *
-from ui_selectDate import Ui_SelectDate
+
+from qgis.core import QgsDataSourceURI
+
 from sqlexecute import SQLExecute
+
+from ui_selectDate import Ui_SelectDate
 from dbconn import DBConn
 
 
@@ -45,11 +46,15 @@ class SelectDateDialog(QDialog, Ui_SelectDate):
         self.conn = self.dbconn.connectToDb(self.uri)
         # self.schema = self.uri.schema()
         self.execute = SQLExecute(self.conn, self.iface.activeLayer())
-        self.dateList = self.execute.retrieveHistVersions(self.iface.activeLayer().name(), self.uri.schema())
+        self.dateList = self.execute.retrieveHistVersions(
+            self.iface.activeLayer().name(), self.uri.schema())
 
         if not self.dateList:
             self.records = False
-            QMessageBox.warning(self.iface.mainWindow(), self.tr(u"Error"), self.tr(u"No historized versions found!"))
+            QMessageBox.warning(
+                self.iface.mainWindow(),
+                self.tr(u"Error"),
+                self.tr(u"No historized versions found!"))
         else:
             for date in self.dateList:
                 self.cmbDate.addItem(str(date[0]))
@@ -61,7 +66,11 @@ class SelectDateDialog(QDialog, Ui_SelectDate):
         Run hist_tabs.version() SQL-function
         """
         if self.records:
-            self.execute.histTabsVersion(self.uri.schema(), self.iface.activeLayer().name(), self.cmbDate.currentText(), self.uri)
+            self.execute.histTabsVersion(
+                self.uri.schema(),
+                self.iface.activeLayer().name(),
+                self.cmbDate.currentText(),
+                self.uri)
 
     @pyqtSignature("")
     def on_buttonBox_rejected(self):

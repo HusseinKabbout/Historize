@@ -15,14 +15,14 @@
   *                                                                         *
   ***************************************************************************/
 """
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt4.QtCore import pyqtSignature
+from PyQt4.QtGui import QDialog, QStandardItemModel, QStandardItem
 
-from qgis.utils import *
-from qgis.core import *
-from qgis.gui import *
-from ui_importUpdate import Ui_ImportUpdate
+from qgis.core import QgsDataSourceURI
+
 from sqlexecute import SQLExecute
+
+from ui_importUpdate import Ui_ImportUpdate
 from dbconn import DBConn
 
 
@@ -92,7 +92,12 @@ class ImportUpdateDialog(QDialog, Ui_ImportUpdate):
         splitString = select.split('.')
         importSchema = splitString[0]
         importTable = splitString[1]
-        self.execute.histTabsUpdate(importSchema, importTable, self.uri.schema(), self.iface.activeLayer().name(), self.hasGeometry, exclList)
+        self.execute.histTabsUpdate(
+            importSchema,
+            importTable,
+            self.uri.schema(),
+            self.iface.activeLayer().name(),
+            self.hasGeometry, exclList)
 
     @pyqtSignature("")
     def on_buttonBox_rejected(self):

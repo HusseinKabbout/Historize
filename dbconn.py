@@ -15,9 +15,8 @@
   *                                                                         *
   ***************************************************************************/
 """
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from qgis.core import *
+from PyQt4.QtGui import QMessageBox
+from qgis.core import QgsCredentials
 
 import psycopg2
 
@@ -37,11 +36,15 @@ class DBConn:
             try:
                 conn = psycopg2.connect(uri.connectionInfo())
             except psycopg2.OperationalError as e:
-                (ok, user, passwd) = QgsCredentials.instance().get(uri.connectionInfo(), uri.username(), uri.password())
+                (ok, user, passwd) = QgsCredentials.instance().get(
+                    uri.connectionInfo(), uri.username(), uri.password())
                 if not ok:
                     break
         if not conn:
-            QMessageBox.warning(self.iface.mainWindow(), self.tr(u"Connection Error"), self.tr(u"Could not connect to PostgreSQL database - check connection."))
+            QMessageBox.warning(self.iface.mainWindow(), self.tr(
+                u"Connection Error"), self.tr(
+                    u"Could not connect to PostgreSQL database "
+                    "- check connection."))
 
         if ok:
             QgsCredentials.instance().put(uri.connectionInfo(), user, passwd)

@@ -15,12 +15,11 @@
   *                                                                         *
   ***************************************************************************/
 """
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt4.QtCore import QUrl, pyqtSignature
+from PyQt4.QtGui import QDialog
 
-from qgis.utils import *
-from qgis.core import *
-from qgis.gui import *
+import os
+
 from ui_about import Ui_About
 
 
@@ -34,7 +33,8 @@ class AboutDialog(QDialog, Ui_About):
         self.loadHtml()
 
     def loadHtml(self):
-        htmlPath = os.path.dirname(os.path.realpath(__file__)) + '/doc/html/about.html'
+        htmlPath = os.path.dirname(os.path.realpath(
+            __file__)) + '/doc/html/about.html'
         self.aboutView.load(QUrl(htmlPath))
 
     @pyqtSignature("")
