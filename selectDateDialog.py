@@ -45,7 +45,8 @@ class SelectDateDialog(QDialog, Ui_SelectDate):
         self.uri = QgsDataSourceURI(provider.dataSourceUri())
         self.conn = self.dbconn.connectToDb(self.uri)
         # self.schema = self.uri.schema()
-        self.execute = SQLExecute(self.conn, self.iface.activeLayer())
+        self.execute = SQLExecute(self.iface.mainWindow(), self.conn,
+                                  self.iface.activeLayer())
         self.dateList = self.execute.retrieveHistVersions(
             self.iface.activeLayer().name(), self.uri.schema())
 

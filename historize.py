@@ -15,12 +15,13 @@
   *                                                                         *
   ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, QCoreApplication, QObject
+from PyQt4.QtCore import QSettings, QTranslator, QCoreApplication, qVersion, QObject
 from PyQt4.QtGui import QAction, QMenu, QMessageBox
 
 from qgis.core import QgsDataSourceURI
 
 import os
+import psycopg2
 
 from importUpdateDialog import ImportUpdateDialog
 from selectDateDialog import SelectDateDialog
@@ -29,10 +30,12 @@ from dbconn import DBConn
 from sqlexecute import SQLExecute
 
 
-class Historize:
+class Historize(QObject):
     """This class handles the initialization and calls of the menus"""
 
     def __init__(self, iface):
+        QObject.__init__(self)
+
         self.iface = iface
         self.dbconn = DBConn(iface)
         self.plugin_dir = os.path.dirname(__file__)
@@ -46,12 +49,10 @@ class Historize:
         if os.path.exists(locale_path):
             self.translator = QTranslator()
             self.translator.load(locale_path)
+            QCoreApplication.installTranslator(self.translator)
 
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
-
-    def tr(self, message):
-        return QCoreApplication.translate('Historize', message)
 
     def initGui(self):
         self.menu = QMenu()
@@ -78,8 +79,8 @@ class Historize:
         self.actionLyrUpdate.triggered.connect(self.doLyrUpdate)
         self.actionAbout.triggered.connect(self.doAbout)
 
-        QObject.connect(self.iface.mapCanvas(), SIGNAL(
-            "currentLayerChanged(QgsMapLayer *)"), self.setMenuOptions)
+        self.iface.legendInterface().currentLayerChanged.connect(
+            self.setMenuOptions)
 
         # Add actions to menu
         self.lyrMenu.addActions(
@@ -112,7 +113,6 @@ class Historize:
                 self.tr(u"Invalid Layer"),
                 self.tr(u"Layer must be provided by postgres!"))
             return
-
         uri = QgsDataSourceURI(provider.dataSourceUri())
         conn = self.dbconn.connectToDb(uri)
         cur = conn.cursor()
@@ -127,24 +127,21 @@ class Historize:
         if result == QMessageBox.Yes:
             sqlPath = os.path.dirname(
                 os.path.realpath(__file__)) + '/sql/historisierung.sql'
-            fd = open(sqlPath, 'r')
-            sqlFile = fd.read()
-            fd.close()
             try:
                 # Ignore first three characters
                 # which invalidate the SQL command
-                cur.execute(sqlFile[3:])
+                cur.execute(open(sqlPath, "r").read())
                 conn.commit()
                 QMessageBox.warning(
                     self.iface.mainWindow(),
                     self.tr(u"Success"),
                     self.tr(u"Database initialized successfully!"))
-            except Exception:
+            except psycopg2.ProgrammingError as e:
                 conn.rollback()
                 QMessageBox.warning(
                     self.iface.mainWindow(),
                     self.tr(u"Error"),
-                    self.tr(u"Unable to initialize database!"))
+                    self.tr(e.message))
             conn.close()
         else:
             return
@@ -155,7 +152,6 @@ class Historize:
         provider = selectedLayer.dataProvider()
         uri = QgsDataSourceURI(provider.dataSourceUri())
         conn = self.dbconn.connectToDb(uri)
-        cur = conn.cursor()
 
         if conn is False:
             return
@@ -171,7 +167,8 @@ class Historize:
             schema = uri.schema()
             table = uri.table()
 
-            self.execute = SQLExecute(conn, selectedLayer)
+            self.execute = SQLExecute(self.iface.mainWindow(), conn,
+                                      selectedLayer)
             success = self.execute.histTabsInit(hasGeometry, schema, table)
             if success:
                 QMessageBox.warning(
@@ -216,12 +213,13 @@ class Historize:
                 self.actionInit.setEnabled(True)
                 uri = QgsDataSourceURI(provider.dataSourceUri())
                 conn = self.dbconn.connectToDb(uri)
-                cur = conn.cursor()
-                self.execute = SQLExecute(conn)
+                self.execute = SQLExecute(self.iface.mainWindow(), conn,
+                                          selectedLayer)
                 result = self.execute.checkIfHistorised(
                     uri.schema(), self.iface.activeLayer().name())
 
                 if result:
+                    self.actionInit.setEnabled(False)
                     self.actionLyrUpdate.setEnabled(True)
                     self.actionLyrLoad.setEnabled(True)
                 else:

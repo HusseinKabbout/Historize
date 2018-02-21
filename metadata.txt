@@ -1,6 +1,7 @@
 [general]
 name=historize
 qgisMinimumVersion=2.14
+qgisMaximumVersion=2.99
 description=Historize Plugin
 
 version=0.0.1

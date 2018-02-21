@@ -70,7 +70,8 @@ class ImportUpdateDialog(QDialog, Ui_ImportUpdate):
            Name Structure <schema.tablename>"""
         self.uri = QgsDataSourceURI(self.provider.dataSourceUri())
         conn = self.dbconn.connectToDb(self.uri)
-        self.execute = SQLExecute(conn)
+        self.execute = SQLExecute(self.iface.mainWindow(), conn,
+                                  self.iface.activeLayer())
 
         # Returns Result to be parsed
         schemaTableList = self.execute.retrieveImportableTables()

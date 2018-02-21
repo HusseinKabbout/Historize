@@ -16,20 +16,23 @@
   ***************************************************************************/
 """
 from PyQt4.QtGui import QMessageBox
+from PyQt4.QtCore import QObject
+
 from qgis.core import QgsCredentials
 
 import psycopg2
 
 
-class DBConn:
+class DBConn(QObject):
     """Class for establishing a DB-connection"""
 
     def __init__(self, iface):
+        QObject.__init__(self)
+
         self.iface = iface
 
     def connectToDb(self, uri):
         """Create a connection object from a uri and return it."""
-        # conninfo = uri.connectionInfo()
         conn = None
         ok = False
         while not conn:
@@ -43,8 +46,7 @@ class DBConn:
         if not conn:
             QMessageBox.warning(self.iface.mainWindow(), self.tr(
                 u"Connection Error"), self.tr(
-                    u"Could not connect to PostgreSQL database "
-                    "- check connection."))
+                    u"Could not connect to PostgreSQL database"))
 
         if ok:
             QgsCredentials.instance().put(uri.connectionInfo(), user, passwd)

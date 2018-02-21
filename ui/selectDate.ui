@@ -37,8 +37,6 @@
     </widget>
    </item>
   </layout>
-  <zorder>dateBox</zorder>
-  <zorder>buttonBox</zorder>
  </widget>
  <resources/>
  <connections>

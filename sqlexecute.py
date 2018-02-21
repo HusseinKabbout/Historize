@@ -17,17 +17,21 @@
 """
 
 from PyQt4.QtGui import QMessageBox
+from PyQt4.QtCore import QObject
 
 from qgis.core import QgsVectorLayer, QgsMapLayerRegistry
 
 from datetime import datetime
 
 
-class SQLExecute:
+class SQLExecute(QObject):
     """Class receives a connection object,
     creates a cursor for it and runs the SQL commands."""
 
-    def __init__(self, conn=None, layer=None):
+    def __init__(self, mainWindow, conn, layer):
+        QObject.__init__(self)
+
+        self.mainWindow = mainWindow
         self.conn = conn
         self.cur = conn.cursor()
         self.layer = layer
@@ -58,7 +62,7 @@ class SQLExecute:
                 QgsMapLayerRegistry.instance().addMapLayers([vlayer], True)
         except Exception:
             QMessageBox.warning(
-                self.iface.mainWindow(),
+                self.mainWindow,
                 self.tr(u"Error"),
                 self.tr(u"Unable to load layer to map reigstry."))
         self.conn.close()
@@ -79,7 +83,7 @@ class SQLExecute:
         except Exception:
             self.conn.rollback()
             QMessageBox.warning(
-                self.iface.mainWindow(),
+                self.mainWindow,
                 self.tr(u"Error"),
                 self.tr(u"Unable to update layer attributes."))
         self.conn.close()
@@ -99,20 +103,14 @@ class SQLExecute:
     def retrieveImportableTables(self):
         """Returns all table names and schemas eglible for an import"""
 
-        importableLayersQuery = "SELECT table_schema, table_name FROM information_schema.columns \
-                           WHERE table_schema != 'information_schema' \
-                           AND table_schema != 'pg_catalog' \
-                           AND NOT table_name IN (
-                           'spatial_ref_sys', 'geography_columns',
-                           'geometry_columns', 'raster_columns')"
+        importableLayersQuery = "SELECT table_schema, table_name FROM information_schema.columns WHERE table_schema != 'information_schema' AND table_schema != 'pg_catalog' AND NOT table_name IN ('spatial_ref_sys', 'geography_columns', 'geometry_columns', 'raster_columns')"
 
         self.cur.execute(importableLayersQuery)
         return self.cur.fetchall()
 
     def checkIfHistorised(self, schema, layer):
         self.success = False
-        isHistorisedQuery = "SELECT hist_id FROM hist_tabs.%s" %
-        schema+"_"+layer
+        isHistorisedQuery = "SELECT hist_id FROM hist_tabs.%s" % schema+"_" + layer
         try:
             self.cur.execute(isHistorisedQuery)
             self.success = True
