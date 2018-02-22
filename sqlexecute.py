@@ -55,11 +55,12 @@ class SQLExecute(QObject):
             schema, layer, date)
         try:
             uri.setDataSource(
-                "", u"(%s\n)" % versionQuery, "wkb_geometry", "", "fid")
+                "", u"(%s\n)" % versionQuery, self.get_geometry(
+                    layer), "", self.get_id(layer))
             vlayer = QgsVectorLayer(uri.uri(), "%s_%s_(Historised)" % (
                 paramDate, layer), "postgres")
             if vlayer.isValid():
-                QgsMapLayerRegistry.instance().addMapLayers([vlayer], True)
+                QgsMapLayerRegistry.instance().addMapLayer(vlayer, True)
         except Exception:
             QMessageBox.warning(
                 self.mainWindow,
@@ -118,3 +119,11 @@ class SQLExecute(QObject):
             pass
         self.conn.close()
         return self.success
+
+    def get_geometry(self, layer):
+        self.cur.execute("SELECT f_geometry_column FROM (SELECT * FROM geometry_columns WHERE f_table_name='%s') as f" % (layer))
+        return self.cur.fetchall()[0][0]
+
+    def get_id(self, layer):
+        self.cur.execute("SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid=i.indrelid AND a.attnum=ANY(i.indkey) WHERE i.indrelid='%s'::regclass AND i.indisprimary;" % (layer))
+        return self.cur.fetchall()[0][0]
