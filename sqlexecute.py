@@ -81,12 +81,12 @@ class SQLExecute(QObject):
         try:
             self.cur.execute(updateQuery)
             self.conn.commit()
-        except Exception:
+        except Exception as e:
             self.conn.rollback()
             QMessageBox.warning(
                 self.mainWindow,
                 self.tr(u"Error"),
-                self.tr(u"Unable to update layer attributes."))
+                self.tr(e.message.split('\n')[0]))
         self.conn.close()
 
     def retrieveHistVersions(self, layer, schema):
@@ -104,7 +104,7 @@ class SQLExecute(QObject):
     def retrieveImportableTables(self):
         """Returns all table names and schemas eglible for an import"""
 
-        importableLayersQuery = "SELECT table_schema, table_name FROM information_schema.columns WHERE table_schema != 'information_schema' AND table_schema != 'pg_catalog' AND NOT table_name IN ('spatial_ref_sys', 'geography_columns', 'geometry_columns', 'raster_columns')"
+        importableLayersQuery = "SELECT table_schema, table_name FROM information_schema.tables WHERE table_schema != 'information_schema' AND table_schema != 'pg_catalog' AND NOT table_name IN ('spatial_ref_sys', 'geography_columns', 'geometry_columns', 'raster_columns')"
 
         self.cur.execute(importableLayersQuery)
         return self.cur.fetchall()
