@@ -31,8 +31,8 @@ class SelectDateDialog(QDialog, Ui_SelectDate):
     """
     Class responsible for handling the date selection.
     """
-    def __init__(self, iface, parent=None):
-        QDialog.__init__(self, parent)
+    def __init__(self, iface):
+        QDialog.__init__(self)
         self.setupUi(self)
         self.iface = iface
         self.dbconn = DBConn(iface)
@@ -45,19 +45,19 @@ class SelectDateDialog(QDialog, Ui_SelectDate):
         self.uri = QgsDataSourceURI(provider.dataSourceUri())
         self.conn = self.dbconn.connect_to_DB(self.uri)
         # self.schema = self.uri.schema()
-        self.execute = SQLExecute(self.iface.mainWindow(), self.conn,
-                                  self.iface.activeLayer())
-        self.dateList = self.execute.retrieve_all_table_versions(
+        self.execute = SQLExecute(
+            self.iface, self.iface.mainWindow(), self.uri)
+        dateList = self.execute.retrieve_all_table_versions(
             self.iface.activeLayer().name(), self.uri.schema())
 
-        if not self.dateList:
+        if not dateList:
             self.records = False
             QMessageBox.warning(
                 self.iface.mainWindow(),
                 self.tr(u"Error"),
                 self.tr(u"No historized versions found!"))
         else:
-            for date in self.dateList:
+            for date in dateList:
                 self.cmbDate.addItem(str(date[0]))
                 self.records = True
 

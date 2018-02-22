@@ -17,42 +17,47 @@
 """
 
 from PyQt4.QtGui import QMessageBox
-from PyQt4.QtCore import QObject
 
 from qgis.core import QgsVectorLayer, QgsMapLayerRegistry
 
+from dbconn import DBConn
+
 from datetime import datetime
+import psycopg2
 
 
-class SQLExecute(QObject):
+class SQLExecute(DBConn):
     """Class receives a connection object,
     creates a cursor for it and runs the SQL commands."""
 
-    def __init__(self, mainWindow, conn, layer):
-        QObject.__init__(self)
+    def __init__(self, iface, mainWindow, uri):
+        DBConn.__init__(self, iface)
 
         self.mainWindow = mainWindow
-        self.conn = conn
-        self.cur = conn.cursor()
-        self.layer = layer
-        self.success = False
+        self.uri = uri
 
     def Init_hist_tabs(self, hasGeometry, schema, table):
         initQuery = "SELECT * FROM hist_tabs._table_init('%s.%s')" % (
             schema, table)
+        success = False
+        msg = ''
+        conn = self.connect_to_DB(self.uri)
+        cur = conn.cursor()
         try:
-            self.cur.execute(initQuery)
-            self.conn.commit()
-            self.success = True
-        except Exception:
-            self.conn.rollback()
-        self.conn.close()
-        return self.success
+            cur.execute(initQuery)
+            conn.commit()
+            success = True
+        except psycopg2.Error as e:
+            conn.rollback()
+            msg = e.message.split('\n')[0]
+        conn.close()
+        return success, msg
 
     def get_older_table_version(self, schema, layer, date, uri):
         paramDate = datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f').date()
         versionQuery = "SELECT * FROM hist_tabs.version(NULL::%s.%s, '%s')" % (
             schema, layer, date)
+        conn = self.connect_to_DB(self.uri)
         try:
             uri.setDataSource(
                 "", u"(%s\n)" % versionQuery, self.get_geometry(
@@ -66,10 +71,10 @@ class SQLExecute(QObject):
                 self.mainWindow,
                 self.tr(u"Error"),
                 self.tr(u"Unable to load layer to map reigstry."))
-        self.conn.close()
+        conn.close()
 
     def update_table_entries(self, importSchema, importTable,
-                       prodSchema, prodTable, hasGeometry, exclList):
+                             prodSchema, prodTable, hasGeometry, exclList):
         exclString = ', '.join(exclList)
         updateQuery = "SELECT * FROM hist_tabs.update( \
                        '%s.%s', \
@@ -78,52 +83,90 @@ class SQLExecute(QObject):
                        '%s')" % (
                            importSchema, importTable, prodSchema,
                            prodTable, hasGeometry, exclString)
+        conn = self.connect_to_DB(self.uri)
+        cur = conn.cursor()
         try:
-            self.cur.execute(updateQuery)
-            self.conn.commit()
-        except Exception as e:
-            self.conn.rollback()
+            cur.execute(updateQuery)
+            conn.commit()
+        except psycopg2.Error as e:
+            conn.rollback()
             QMessageBox.warning(
                 self.mainWindow,
                 self.tr(u"Error"),
                 self.tr(e.message.split('\n')[0]))
-        self.conn.close()
+        conn.close()
 
     def retrieve_all_table_versions(self, layer, schema):
         """Returns a list of historized dates or False"""
-        getHistorizedDatesQuery = "SELECT DISTINCT valid_from FROM hist_tabs.%s" % schema+"_"+layer
+        getHistorizedDatesQuery = "SELECT DISTINCT valid_from \
+        FROM hist_tabs.%s" % schema+"_"+layer
+        conn = self.connect_to_DB(self.uri)
+        cur = conn.cursor()
         try:
-            self.cur.execute(getHistorizedDatesQuery)
-            self.conn.commit()
-            dateList = self.cur.fetchall()
-        except Exception:
-            self.conn.rollback()
+            cur.execute(getHistorizedDatesQuery)
+            conn.commit()
+            dateList = cur.fetchall()
+        except psycopg2.Error as e:
+            conn.rollback()
             dateList = False
         return dateList
 
     def retrieve_all_importable_tables(self):
         """Returns all table names and schemas eglible for an import"""
 
-        importableLayersQuery = "SELECT table_schema, table_name FROM information_schema.tables WHERE table_schema != 'information_schema' AND table_schema != 'pg_catalog' AND NOT table_name IN ('spatial_ref_sys', 'geography_columns', 'geometry_columns', 'raster_columns')"
+        importableLayersQuery = "SELECT table_schema, table_name \
+        FROM information_schema.tables \
+        WHERE table_schema != 'information_schema' \
+        AND table_schema != 'pg_catalog' \
+        AND NOT table_name IN \
+        ('spatial_ref_sys', 'geography_columns', \
+        'geometry_columns', 'raster_columns')"
+        conn = self.connect_to_DB(self.uri)
+        cur = conn.cursor()
 
-        self.cur.execute(importableLayersQuery)
-        return self.cur.fetchall()
+        cur.execute(importableLayersQuery)
+        return cur.fetchall()
 
     def check_if_historised(self, schema, layer):
-        self.success = False
-        isHistorisedQuery = "SELECT hist_id FROM hist_tabs.%s" % schema+"_" + layer
+        isHistorisedQuery = "SELECT hist_id \
+        FROM hist_tabs.%s" % schema+"_" + layer
+        conn = self.connect_to_DB(self.uri)
+        cur = conn.cursor()
         try:
-            self.cur.execute(isHistorisedQuery)
+            cur.execute(isHistorisedQuery)
             self.success = True
-        except Exception:
-            pass
-        self.conn.close()
+        except psycopg2.Error as e:
+            self.success = False
+        conn.close()
         return self.success
 
     def get_geometry(self, layer):
-        self.cur.execute("SELECT f_geometry_column FROM (SELECT * FROM geometry_columns WHERE f_table_name='%s') as f" % (layer))
-        return self.cur.fetchall()[0][0]
+        conn = self.connect_to_DB(self.uri)
+        cur = conn.cursor()
+        cur.execute("SELECT f_geometry_column FROM (\
+                         SELECT * FROM geometry_columns \
+                         WHERE f_table_name='%s') as f" % (layer))
+        return cur.fetchall()[0][0]
+        conn.close()
 
     def get_id(self, layer):
-        self.cur.execute("SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid=i.indrelid AND a.attnum=ANY(i.indkey) WHERE i.indrelid='%s'::regclass AND i.indisprimary;" % (layer))
-        return self.cur.fetchall()[0][0]
+        conn = self.connect_to_DB(self.uri)
+        cur = conn.cursor()
+        cur.execute("SELECT a.attname FROM pg_index i \
+                         JOIN pg_attribute a ON a.attrelid=i.indrelid \
+                         AND a.attnum=ANY(i.indkey) \
+                         WHERE i.indrelid='%s'::regclass \
+                         AND i.indisprimary;" % (layer))
+        return cur.fetchall()[0][0]
+        conn.close()
+
+    def db_initialize_check(self, schema):
+        isInitializedQuery = "SELECT TRUE FROM information_schema.schemata \
+        WHERE schema_name = 'hist_tabs';"
+        conn = self.connect_to_DB(self.uri)
+        cur = conn.cursor()
+
+        cur.execute(isInitializedQuery)
+        success = bool(cur.rowcount)
+        conn.close()
+        return success

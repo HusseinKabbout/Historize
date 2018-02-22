@@ -30,8 +30,8 @@ class ImportUpdateDialog(QDialog, Ui_ImportUpdate):
     """
     Class responsible for handling the update() function.
     """
-    def __init__(self, iface, parent=None):
-        QDialog.__init__(self, parent)
+    def __init__(self, iface):
+        QDialog.__init__(self)
         self.setupUi(self)
         self.iface = iface
         self.dbconn = DBConn(iface)
@@ -69,9 +69,8 @@ class ImportUpdateDialog(QDialog, Ui_ImportUpdate):
 
            Name Structure <schema.tablename>"""
         self.uri = QgsDataSourceURI(self.provider.dataSourceUri())
-        conn = self.dbconn.connect_to_DB(self.uri)
-        self.execute = SQLExecute(self.iface.mainWindow(), conn,
-                                  self.iface.activeLayer())
+        self.execute = SQLExecute(
+            self.iface, self.iface.mainWindow(), self.uri)
 
         # Returns Result to be parsed
         schemaTableList = self.execute.retrieve_all_importable_tables()

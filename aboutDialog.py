@@ -27,8 +27,8 @@ class AboutDialog(QDialog, Ui_About):
     """
     Class for displaying the user manual
     """
-    def __init__(self, parent=None):
-        QDialog.__init__(self, parent)
+    def __init__(self):
+        QDialog.__init__(self)
         self.setupUi(self)
         self.load_html()
 
@@ -38,14 +38,5 @@ class AboutDialog(QDialog, Ui_About):
         self.aboutView.load(QUrl(htmlPath))
 
     @pyqtSignature("")
-    def on_buttonBox_accepted(self):
-        """
-        Slot documentation goes here.
-        """
-
-    @pyqtSignature("")
     def on_buttonBox_rejected(self):
-        """
-        Slot documentation goes here.
-        """
         self.close()

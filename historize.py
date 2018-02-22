@@ -15,7 +15,8 @@
   *                                                                         *
   ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, QCoreApplication, qVersion, QObject
+from PyQt4.QtCore import (QSettings, QTranslator, QCoreApplication,
+                          qVersion, QObject)
 from PyQt4.QtGui import QAction, QMenu, QMessageBox
 
 from qgis.core import QgsDataSourceURI
@@ -38,21 +39,21 @@ class Historize(QObject):
 
         self.iface = iface
         self.dbconn = DBConn(iface)
-        self.plugin_dir = os.path.dirname(__file__)
+        plugin_dir = os.path.dirname(__file__)
         # initialize locale
         locale = QSettings().value('locale/userLocale')[0:2]
         locale_path = os.path.join(
-            self.plugin_dir,
+            plugin_dir,
             'i18n',
             'Historize_{}.qm'.format(locale))
 
         if os.path.exists(locale_path):
-            self.translator = QTranslator()
-            self.translator.load(locale_path)
-            QCoreApplication.installTranslator(self.translator)
+            translator = QTranslator()
+            translator.load(locale_path)
+            QCoreApplication.installTranslator(translator)
 
             if qVersion() > '4.3.3':
-                QCoreApplication.installTranslator(self.translator)
+                QCoreApplication.installTranslator(translator)
 
     def initGui(self):
         self.menu = QMenu()
@@ -137,13 +138,14 @@ class Historize(QObject):
                     self.iface.mainWindow(),
                     self.tr(u"Success"),
                     self.tr(u"Database initialized successfully!"))
-            except psycopg2.ProgrammingError as e:
+            except psycopg2.Error as e:
                 conn.rollback()
                 QMessageBox.warning(
                     self.iface.mainWindow(),
                     self.tr(u"Error"),
-                    self.tr(e.message))
+                    self.tr(u"Couldn't initialize Database.\n" + e.message))
             conn.close()
+            self.enable_disable_gui(selectedLayer)
         else:
             return
 
@@ -168,9 +170,8 @@ class Historize(QObject):
             schema = uri.schema()
             table = uri.table()
 
-            self.execute = SQLExecute(self.iface.mainWindow(), conn,
-                                      selectedLayer)
-            success = self.execute.Init_hist_tabs(hasGeometry, schema, table)
+            execute = SQLExecute(self.iface, self.iface.mainWindow(), uri)
+            success, msg = execute.Init_hist_tabs(hasGeometry, schema, table)
             if success:
                 QMessageBox.warning(
                     self.iface.mainWindow(),
@@ -180,7 +181,8 @@ class Historize(QObject):
                 QMessageBox.warning(
                     self.iface.mainWindow(),
                     self.tr(u"Error"),
-                    self.tr(u"Initialization failed!"))
+                    self.tr(u"Initialization failed!\n" + msg))
+            self.enable_disable_gui(selectedLayer)
         else:
             return
 
@@ -201,10 +203,11 @@ class Historize(QObject):
 
     def enable_disable_gui(self, layer):
         """Enable/Disable menu options based on selected layer"""
+        self.actionInitDB.setEnabled(False)
+        self.layerMenu.setEnabled(False)
         self.actionInitLayer.setEnabled(False)
         self.actionLayerUpdate.setEnabled(False)
         self.actionLayerLoad.setEnabled(False)
-        self.actionInitDB.setEnabled(False)
 
         selectedLayer = self.iface.activeLayer()
         if selectedLayer:
@@ -213,14 +216,18 @@ class Historize(QObject):
             if provider.name() == "postgres":
                 self.actionInitDB.setEnabled(True)
                 uri = QgsDataSourceURI(provider.dataSourceUri())
-                conn = self.dbconn.connect_to_DB(uri)
-                self.execute = SQLExecute(self.iface.mainWindow(), conn,
-                                          selectedLayer)
-                result = self.execute.check_if_historised(
+                execute = SQLExecute(self.iface, self.iface.mainWindow(), uri)
+                historised = execute.check_if_historised(
                     uri.schema(), self.iface.activeLayer().name())
+                db_initialized = execute.db_initialize_check(uri.schema())
 
-                if result:
+                if db_initialized:
                     self.actionInitDB.setEnabled(False)
+                    self.layerMenu.setEnabled(True)
+                else:
+                    self.layerMenu.setEnabled(False)
+
+                if historised:
                     self.actionLayerUpdate.setEnabled(True)
                     self.actionLayerLoad.setEnabled(True)
                 else:
