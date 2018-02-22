@@ -30,9 +30,9 @@ class AboutDialog(QDialog, Ui_About):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.setupUi(self)
-        self.loadHtml()
+        self.load_html()
 
-    def loadHtml(self):
+    def load_html(self):
         htmlPath = os.path.dirname(os.path.realpath(
             __file__)) + '/doc/html/about.html'
         self.aboutView.load(QUrl(htmlPath))

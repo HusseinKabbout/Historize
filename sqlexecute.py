@@ -37,7 +37,7 @@ class SQLExecute(QObject):
         self.layer = layer
         self.success = False
 
-    def histTabsInit(self, hasGeometry, schema, table):
+    def Init_hist_tabs(self, hasGeometry, schema, table):
         initQuery = "SELECT * FROM hist_tabs._table_init('%s.%s')" % (
             schema, table)
         try:
@@ -49,7 +49,7 @@ class SQLExecute(QObject):
         self.conn.close()
         return self.success
 
-    def histTabsVersion(self, schema, layer, date, uri):
+    def get_older_table_version(self, schema, layer, date, uri):
         paramDate = datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f').date()
         versionQuery = "SELECT * FROM hist_tabs.version(NULL::%s.%s, '%s')" % (
             schema, layer, date)
@@ -68,7 +68,7 @@ class SQLExecute(QObject):
                 self.tr(u"Unable to load layer to map reigstry."))
         self.conn.close()
 
-    def histTabsUpdate(self, importSchema, importTable,
+    def update_table_entries(self, importSchema, importTable,
                        prodSchema, prodTable, hasGeometry, exclList):
         exclString = ', '.join(exclList)
         updateQuery = "SELECT * FROM hist_tabs.update( \
@@ -89,7 +89,7 @@ class SQLExecute(QObject):
                 self.tr(e.message.split('\n')[0]))
         self.conn.close()
 
-    def retrieveHistVersions(self, layer, schema):
+    def retrieve_all_table_versions(self, layer, schema):
         """Returns a list of historized dates or False"""
         getHistorizedDatesQuery = "SELECT DISTINCT valid_from FROM hist_tabs.%s" % schema+"_"+layer
         try:
@@ -101,7 +101,7 @@ class SQLExecute(QObject):
             dateList = False
         return dateList
 
-    def retrieveImportableTables(self):
+    def retrieve_all_importable_tables(self):
         """Returns all table names and schemas eglible for an import"""
 
         importableLayersQuery = "SELECT table_schema, table_name FROM information_schema.tables WHERE table_schema != 'information_schema' AND table_schema != 'pg_catalog' AND NOT table_name IN ('spatial_ref_sys', 'geography_columns', 'geometry_columns', 'raster_columns')"
@@ -109,7 +109,7 @@ class SQLExecute(QObject):
         self.cur.execute(importableLayersQuery)
         return self.cur.fetchall()
 
-    def checkIfHistorised(self, schema, layer):
+    def check_if_historised(self, schema, layer):
         self.success = False
         isHistorisedQuery = "SELECT hist_id FROM hist_tabs.%s" % schema+"_" + layer
         try:

@@ -31,7 +31,7 @@ class DBConn(QObject):
 
         self.iface = iface
 
-    def connectToDb(self, uri):
+    def connect_to_DB(self, uri):
         """Create a connection object from a uri and return it."""
         conn = None
         ok = False

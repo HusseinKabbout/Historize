@@ -35,10 +35,10 @@ class ImportUpdateDialog(QDialog, Ui_ImportUpdate):
         self.setupUi(self)
         self.iface = iface
         self.dbconn = DBConn(iface)
-        self.getAttributes()
-        self.setImportableTables()
+        self.get_attributes()
+        self.set_importable_tables()
 
-    def getAttributes(self):
+    def get_attributes(self):
         """Place excludable attributes in model list"""
         # Model Structure used from Tutorial at
         # http://pythoncentral.io/pyside-pyqt-tutorial-qlistview-and-qstandarditemmodel/
@@ -54,7 +54,7 @@ class ImportUpdateDialog(QDialog, Ui_ImportUpdate):
             self.model.appendRow(item)
         self.listTblAttrib.setModel(self.model)
 
-    def getCheckedAttributes(self):
+    def get_checked_attributes(self):
         """Creates a list of checked elements to be excluded"""
         i = 0
         exclList = list()
@@ -64,17 +64,17 @@ class ImportUpdateDialog(QDialog, Ui_ImportUpdate):
             i += 1
         return exclList
 
-    def setImportableTables(self):
+    def set_importable_tables(self):
         """Populates combobox with importable tables
 
            Name Structure <schema.tablename>"""
         self.uri = QgsDataSourceURI(self.provider.dataSourceUri())
-        conn = self.dbconn.connectToDb(self.uri)
+        conn = self.dbconn.connect_to_DB(self.uri)
         self.execute = SQLExecute(self.iface.mainWindow(), conn,
                                   self.iface.activeLayer())
 
         # Returns Result to be parsed
-        schemaTableList = self.execute.retrieveImportableTables()
+        schemaTableList = self.execute.retrieve_all_importable_tables()
         cmbList = list()
         if schemaTableList:
             for entry in schemaTableList:
@@ -88,12 +88,12 @@ class ImportUpdateDialog(QDialog, Ui_ImportUpdate):
         Run hist_tabs.update() SQL function with given parameters
         """
         select = self.cmbImportTable.currentText()
-        exclList = self.getCheckedAttributes()
+        exclList = self.get_checked_attributes()
         # Split the user selection for querying
         splitString = select.split('.')
         importSchema = splitString[0]
         importTable = splitString[1]
-        self.execute.histTabsUpdate(
+        self.execute.update_table_entries(
             importSchema,
             importTable,
             self.uri.schema(),

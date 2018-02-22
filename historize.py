@@ -58,50 +58,51 @@ class Historize(QObject):
         self.menu = QMenu()
         self.menu.setTitle("Historize")
 
-        self.lyrMenu = QMenu()
-        self.lyrMenu.setTitle("Layer")
+        self.layerMenu = QMenu()
+        self.layerMenu.setTitle("Layer")
 
         # Create menu actions
-        self.actionInit = QAction(self.tr(u"Initialize Database"),
-                                  self.iface.mainWindow())
-        self.actionLyrInit = QAction(self.tr(u"Initialize Layer"),
-                                     self.iface.mainWindow())
-        self.actionLyrUpdate = QAction(self.tr(u"Update Layer"),
+        self.actionInitDB = QAction(self.tr(u"Initialize Database"),
+                                    self.iface.mainWindow())
+        self.actionInitLayer = QAction(self.tr(u"Initialize Layer"),
                                        self.iface.mainWindow())
-        self.actionLyrLoad = QAction(self.tr(u"Load Layer"),
-                                     self.iface.mainWindow())
+        self.actionLayerUpdate = QAction(self.tr(u"Update Layer"),
+                                         self.iface.mainWindow())
+        self.actionLayerLoad = QAction(self.tr(u"Load Layer"),
+                                       self.iface.mainWindow())
         self.actionAbout = QAction(self.tr(u"About"), self.iface.mainWindow())
 
         # Connect menu actions
-        self.actionInit.triggered.connect(self.doInit)
-        self.actionLyrInit.triggered.connect(self.doLyrInit)
-        self.actionLyrLoad.triggered.connect(self.doLyrLoad)
-        self.actionLyrUpdate.triggered.connect(self.doLyrUpdate)
-        self.actionAbout.triggered.connect(self.doAbout)
+        self.actionInitDB.triggered.connect(self.initialize_database)
+        self.actionInitLayer.triggered.connect(self.initialize_layer)
+        self.actionLayerLoad.triggered.connect(self.show_load_layer_dialog)
+        self.actionLayerUpdate.triggered.connect(self.show_update_layer_dialog)
+        self.actionAbout.triggered.connect(self.show_about_dialog)
 
         self.iface.legendInterface().currentLayerChanged.connect(
-            self.setMenuOptions)
+            self.enable_disable_gui)
 
         # Add actions to menu
-        self.lyrMenu.addActions(
-            [self.actionLyrInit, self.actionLyrLoad, self.actionLyrUpdate])
-        self.menu.addAction(self.actionInit)
-        self.menu.addMenu(self.lyrMenu)
+        self.layerMenu.addActions(
+            [self.actionInitLayer,
+             self.actionLayerLoad, self.actionLayerUpdate])
+        self.menu.addAction(self.actionInitDB)
+        self.menu.addMenu(self.layerMenu)
         self.menu.addAction(self.actionAbout)
         self.menu.insertSeparator(self.actionAbout)
         menuBar = self.iface.mainWindow().menuBar()
         menuBar.addMenu(self.menu)
 
         # Disable unusable actions
-        self.actionInit.setEnabled(False)
-        self.actionLyrInit.setEnabled(False)
-        self.actionLyrUpdate.setEnabled(False)
-        self.actionLyrLoad.setEnabled(False)
+        self.actionInitDB.setEnabled(False)
+        self.actionInitLayer.setEnabled(False)
+        self.actionLayerUpdate.setEnabled(False)
+        self.actionLayerLoad.setEnabled(False)
 
     def unload(self):
         self.menu.deleteLater()
 
-    def doInit(self):
+    def initialize_database(self):
         """Use Database info from layer and run historisation.sql on it."""
 
         selectedLayer = self.iface.activeLayer()
@@ -114,7 +115,7 @@ class Historize(QObject):
                 self.tr(u"Layer must be provided by postgres!"))
             return
         uri = QgsDataSourceURI(provider.dataSourceUri())
-        conn = self.dbconn.connectToDb(uri)
+        conn = self.dbconn.connect_to_DB(uri)
         cur = conn.cursor()
         if conn is False:
             return
@@ -146,12 +147,12 @@ class Historize(QObject):
         else:
             return
 
-    def doLyrInit(self):
+    def initialize_layer(self):
         """Use Layer info and run init() .sql query"""
         selectedLayer = self.iface.activeLayer()
         provider = selectedLayer.dataProvider()
         uri = QgsDataSourceURI(provider.dataSourceUri())
-        conn = self.dbconn.connectToDb(uri)
+        conn = self.dbconn.connect_to_DB(uri)
 
         if conn is False:
             return
@@ -169,7 +170,7 @@ class Historize(QObject):
 
             self.execute = SQLExecute(self.iface.mainWindow(), conn,
                                       selectedLayer)
-            success = self.execute.histTabsInit(hasGeometry, schema, table)
+            success = self.execute.Init_hist_tabs(hasGeometry, schema, table)
             if success:
                 QMessageBox.warning(
                     self.iface.mainWindow(),
@@ -183,44 +184,44 @@ class Historize(QObject):
         else:
             return
 
-    def doLyrUpdate(self):
+    def show_update_layer_dialog(self):
         """Open ImportUpdate dialog"""
         self.updateDialog = ImportUpdateDialog(self.iface)
         self.updateDialog.show()
 
-    def doLyrLoad(self):
+    def show_load_layer_dialog(self):
         """Open selectDate dialog"""
         self.dateDialog = SelectDateDialog(self.iface)
         self.dateDialog.show()
 
-    def doAbout(self):
+    def show_about_dialog(self):
         """Show About dialog"""
         self.aboutDialog = AboutDialog()
         self.aboutDialog.show()
 
-    def setMenuOptions(self, layer):
+    def enable_disable_gui(self, layer):
         """Enable/Disable menu options based on selected layer"""
-        self.actionLyrInit.setEnabled(False)
-        self.actionLyrUpdate.setEnabled(False)
-        self.actionLyrLoad.setEnabled(False)
-        self.actionInit.setEnabled(False)
+        self.actionInitLayer.setEnabled(False)
+        self.actionLayerUpdate.setEnabled(False)
+        self.actionLayerLoad.setEnabled(False)
+        self.actionInitDB.setEnabled(False)
 
         selectedLayer = self.iface.activeLayer()
         if selectedLayer:
             provider = layer.dataProvider()
 
             if provider.name() == "postgres":
-                self.actionInit.setEnabled(True)
+                self.actionInitDB.setEnabled(True)
                 uri = QgsDataSourceURI(provider.dataSourceUri())
-                conn = self.dbconn.connectToDb(uri)
+                conn = self.dbconn.connect_to_DB(uri)
                 self.execute = SQLExecute(self.iface.mainWindow(), conn,
                                           selectedLayer)
-                result = self.execute.checkIfHistorised(
+                result = self.execute.check_if_historised(
                     uri.schema(), self.iface.activeLayer().name())
 
                 if result:
-                    self.actionInit.setEnabled(False)
-                    self.actionLyrUpdate.setEnabled(True)
-                    self.actionLyrLoad.setEnabled(True)
+                    self.actionInitDB.setEnabled(False)
+                    self.actionLayerUpdate.setEnabled(True)
+                    self.actionLayerLoad.setEnabled(True)
                 else:
-                    self.actionLyrInit.setEnabled(True)
+                    self.actionInitLayer.setEnabled(True)

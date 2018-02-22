@@ -37,17 +37,17 @@ class SelectDateDialog(QDialog, Ui_SelectDate):
         self.iface = iface
         self.dbconn = DBConn(iface)
         self.cmbDate.clear()
-        self.getDates()
+        self.get_dates()
 
-    def getDates(self):
+    def get_dates(self):
         """Get all historized dates from layer"""
         provider = self.iface.activeLayer().dataProvider()
         self.uri = QgsDataSourceURI(provider.dataSourceUri())
-        self.conn = self.dbconn.connectToDb(self.uri)
+        self.conn = self.dbconn.connect_to_DB(self.uri)
         # self.schema = self.uri.schema()
         self.execute = SQLExecute(self.iface.mainWindow(), self.conn,
                                   self.iface.activeLayer())
-        self.dateList = self.execute.retrieveHistVersions(
+        self.dateList = self.execute.retrieve_all_table_versions(
             self.iface.activeLayer().name(), self.uri.schema())
 
         if not self.dateList:
@@ -67,7 +67,7 @@ class SelectDateDialog(QDialog, Ui_SelectDate):
         Run hist_tabs.version() SQL-function
         """
         if self.records:
-            self.execute.histTabsVersion(
+            self.execute.get_older_table_version(
                 self.uri.schema(),
                 self.iface.activeLayer().name(),
                 self.cmbDate.currentText(),
